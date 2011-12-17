@@ -66,7 +66,7 @@ public class EffectGainHealth extends Effect {
             //Check if the player owns or is a member of the region
             if (!effect.isOwnerOfRegion(player, l) && !effect.isMemberOfRegion(player, l) && hero == null) {
                 return;
-            } else if (!rt.containsFriendlyClass(hero.getHeroClass().getName())) {
+            } else if (hero != null && !rt.containsFriendlyClass(hero.getHeroClass().getName())) {
                 return;
             }
             
