@@ -1,5 +1,6 @@
 package main.java.multitallented.plugins.herostronghold.effects;
 
+import java.util.ArrayList;
 import main.java.multitallented.plugins.herostronghold.Effect;
 import main.java.multitallented.plugins.herostronghold.HeroStronghold;
 import main.java.multitallented.plugins.herostronghold.PlayerInRegionEvent;
@@ -49,7 +50,7 @@ public class EffectLandMine extends Effect {
             Location l = pIREvent.getRegionLocation();
             
             //Check if the player owns or is a member of the region
-            if (!effect.isOwnerOfRegion(player, l) && !effect.isMemberOfRegion(player, l)) {
+            if (effect.isOwnerOfRegion(player, l) || effect.isMemberOfRegion(player, l)) {
                 return;
             }
             
@@ -69,6 +70,11 @@ public class EffectLandMine extends Effect {
                 l.getBlock().setTypeId(46);
                 l.getBlock().getRelative(BlockFace.DOWN).setType(Material.REDSTONE_TORCH_ON);
             }
+            
+            //Set the event to destroy the region
+            ArrayList<Location> tempArray = new ArrayList<Location>();
+            tempArray.add(l);
+            pIREvent.setRegionsToDestroy(tempArray);
         }
     }
     

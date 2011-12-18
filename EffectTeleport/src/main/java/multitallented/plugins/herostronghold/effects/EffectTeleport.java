@@ -47,12 +47,18 @@ public class EffectTeleport extends Effect {
             Location l = pIREvent.getRegionLocation();
             RegionManager rm = getPlugin().getRegionManager();
             Region r = rm.getRegion(l);
+            RegionType rt = rm.getRegionType(r.getType());
+            
+            //Check if the region is a teleporter
+            if (effect.regionHasEffect(rt.getEffects(), "teleport") == 0)
+                return;
+            
             //Check if there is another teleporter owned by that player
             String owner = r.getOwners().get(0);
             Location targetLoc = null;
             for (Location loc : rm.getRegionLocations()) {
-                if (rm.getRegion(loc).getOwners().get(0).equals(owner) && rm.getRegion(loc) != rm.getRegion(l)) {
-                    Region targetR = rm.getRegion(loc);
+                Region targetR = rm.getRegion(loc);
+                if (!targetR.getOwners().isEmpty() && targetR.getOwners().get(0).equals(owner) && targetR != rm.getRegion(l)) {
                     RegionType targetRT = rm.getRegionType(targetR.getType());
                     if (effect.regionHasEffect(targetRT.getEffects(), "teleport") != 0)
                         targetLoc = loc;
@@ -66,18 +72,10 @@ public class EffectTeleport extends Effect {
             }
             
             
-            RegionType rt = rm.getRegionType(r.getType()); 
-            
-            
-            //Check if the region has teleport effect
-            if (effect.regionHasEffect(rt.getEffects(), "teleport") == 0)
-                return;
-            
-            
-            
             //Check to see if the HeroStronghold has enough reagents
             if (!effect.hasReagents(l))
                 return;
+            
             //Run upkeep but don't need to know if upkeep occured
             effect.forceUpkeep(l);
             player.teleport(targetLoc.getBlock().getRelative(BlockFace.NORTH, 2).getLocation());

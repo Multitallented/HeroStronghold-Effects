@@ -40,6 +40,8 @@ public class EffectPeriodicUpkeep extends Effect {
             UpkeepEvent uEvent = (UpkeepEvent) event;
             Location l = uEvent.getRegionLocation();
             Region r = getPlugin().getRegionManager().getRegion(uEvent.getRegionLocation());
+            if (r == null)
+                return;
             RegionType rt = getPlugin().getRegionManager().getRegionType(r.getType()); 
             
             //Check if the region has the shoot arrow effect and return arrow velocity
