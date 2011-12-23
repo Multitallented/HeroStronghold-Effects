@@ -44,16 +44,18 @@ public class EffectDenyBlockBuild extends Effect {
             Player player = event.getPlayer();
             RegionManager rm = effect.getPlugin().getRegionManager();
             for (Location l : rm.getRegionLocations()) {
-                Region r = rm.getRegion(l);
-                RegionType rt = rm.getRegionType(r.getType());
-                if (rt.getRadius() >= Math.sqrt(l.distanceSquared(loc))) {
-                    if ((r.isOwner(player.getName()) || r.isMember(player.getName())) || effect.regionHasEffect(rt.getEffects(), "denyblockbuild") == 0 ||
-                            !effect.hasReagents(l))
+                if (l.getWorld().getName().equals(loc.getWorld().getName())) {
+                    Region r = rm.getRegion(l);
+                    RegionType rt = rm.getRegionType(r.getType());
+                    if (rt.getRadius() >= Math.sqrt(l.distanceSquared(loc))) {
+                        if ((r.isOwner(player.getName()) || r.isMember(player.getName())) || effect.regionHasEffect(rt.getEffects(), "denyblockbuild") == 0 ||
+                                !effect.hasReagents(l))
+                            return;
+
+                        player.sendMessage(ChatColor.GRAY + "[HeroStronghold] This region is protected by a " + r.getType());
+                        event.setCancelled(true);
                         return;
-                    
-                    player.sendMessage(ChatColor.GRAY + "[HeroStronghold] This region is protected by a " + r.getType());
-                    event.setCancelled(true);
-                    return;
+                    }
                 }
             }
         }
