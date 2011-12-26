@@ -2,12 +2,15 @@ package main.java.multitallented.plugins.herostronghold.effects;
 
 import main.java.multitallented.plugins.herostronghold.Effect;
 import main.java.multitallented.plugins.herostronghold.HeroStronghold;
+import main.java.multitallented.plugins.herostronghold.PlayerInRegionEvent;
 import main.java.multitallented.plugins.herostronghold.Region;
 import main.java.multitallented.plugins.herostronghold.RegionType;
 import main.java.multitallented.plugins.herostronghold.UpkeepEvent;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Creature;
 import org.bukkit.entity.CreatureType;
+import org.bukkit.entity.Entity;
 import org.bukkit.event.CustomEventListener;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
@@ -20,7 +23,7 @@ import org.bukkit.event.Event.Type;
 public class EffectPeriodicFarm extends Effect {
     public EffectPeriodicFarm(HeroStronghold plugin) {
         super(plugin);
-        registerEvent(Type.CUSTOM_EVENT, new UpkeepListener(this), Priority.Highest);
+        registerEvent(Type.CUSTOM_EVENT, new PlayerInRegionListener(this), Priority.Highest);
     }
     
     @Override
@@ -28,9 +31,9 @@ public class EffectPeriodicFarm extends Effect {
         super.init(plugin);
     }
     
-    public class UpkeepListener extends CustomEventListener {
+    public class PlayerInRegionListener extends CustomEventListener {
         private final EffectPeriodicFarm effect;
-        public UpkeepListener(EffectPeriodicFarm effect) {
+        public PlayerInRegionListener(EffectPeriodicFarm effect) {
             this.effect = effect;
         }
         
@@ -39,9 +42,9 @@ public class EffectPeriodicFarm extends Effect {
         public void onCustomEvent(Event event) {
             if (!(event instanceof UpkeepEvent))
                 return;
-            UpkeepEvent uEvent = (UpkeepEvent) event;
-            Location l = uEvent.getRegionLocation();
-            Region r = getPlugin().getRegionManager().getRegion(uEvent.getRegionLocation());
+            PlayerInRegionEvent pirEvent = (PlayerInRegionEvent) event;
+            Location l = pirEvent.getRegionLocation();
+            Region r = getPlugin().getRegionManager().getRegion(pirEvent.getRegionLocation());
             if (r == null)
                 return;
             RegionType rt = getPlugin().getRegionManager().getRegionType(r.getType()); 
@@ -50,6 +53,7 @@ public class EffectPeriodicFarm extends Effect {
             int animalType = effect.regionHasEffect(rt.getEffects(), "periodicfarm");
             CreatureType ct = null;
             switch (animalType) {
+                default:
                 case 0:
                    return;
                 case 1:
@@ -102,11 +106,22 @@ public class EffectPeriodicFarm extends Effect {
                    break;
             }
             
+            int radius = rt.getRadius();
+            int i = 0;
+            for (Entity e : pirEvent.getPlayer().getNearbyEntities(radius, radius, radius)) {
+                if (e instanceof Creature) {
+                    i++;
+                }
+            }
+            if (i > 7)
+                return;
+            
             //Check to see if the HeroStronghold has enough reagents
             if (!effect.hasReagents(l))
                 return;
-            //Run upkeep but don't need to know if upkeep occured
-            effect.forceUpkeep(l);
+            //Check for upkeep
+            if (!effect.upkeep(l))
+                return;
             
             l.getWorld().spawnCreature(l.getBlock().getRelative(BlockFace.UP).getLocation(), ct);
         }

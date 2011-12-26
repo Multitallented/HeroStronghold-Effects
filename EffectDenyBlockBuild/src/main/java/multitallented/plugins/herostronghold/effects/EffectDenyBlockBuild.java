@@ -12,6 +12,9 @@ import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
 import org.bukkit.event.block.BlockListener;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EndermanPlaceEvent;
+import org.bukkit.event.entity.EntityListener;
+import org.bukkit.event.painting.PaintingPlaceEvent;
 
 /**
  *
@@ -22,11 +25,29 @@ public class EffectDenyBlockBuild extends Effect {
         super(plugin);
         DenyBuildListener dbListener = new DenyBuildListener(this);
         registerEvent(Type.BLOCK_PLACE, dbListener, Priority.Highest);
+        registerEvent(Type.PAINTING_PLACE, new PListener(), Priority.High);
     }
     
     @Override
     public void init(HeroStronghold plugin) {
         super.init(plugin);
+    }
+    
+    public boolean shouldTakeAction(Location loc, Player player) {
+        RegionManager rm = getPlugin().getRegionManager();
+        for (Location l : rm.getRegionLocations()) {
+            if (l.getWorld().getName().equals(loc.getWorld().getName())) {
+                Region r = rm.getRegion(l);
+                RegionType rt = rm.getRegionType(r.getType());
+                if (rt.getRadius() >= Math.sqrt(l.distanceSquared(loc))) {
+                    if ((r.isOwner(player.getName()) || r.isMember(player.getName())) || regionHasEffect(rt.getEffects(), "denyblockbuild") == 0 ||
+                            !hasReagents(l))
+                        return false;
+                    return true;
+                }
+            }
+        }
+        return false;
     }
     
     public class DenyBuildListener extends BlockListener {
@@ -38,26 +59,29 @@ public class EffectDenyBlockBuild extends Effect {
         
         @Override
         public void onBlockPlace(BlockPlaceEvent event) {
-            if (event.isCancelled())
+            if (event.isCancelled() || !shouldTakeAction(event.getBlock().getLocation(), event.getPlayer()))
                 return;
-            Location loc = event.getBlock().getLocation();
-            Player player = event.getPlayer();
-            RegionManager rm = effect.getPlugin().getRegionManager();
-            for (Location l : rm.getRegionLocations()) {
-                if (l.getWorld().getName().equals(loc.getWorld().getName())) {
-                    Region r = rm.getRegion(l);
-                    RegionType rt = rm.getRegionType(r.getType());
-                    if (rt.getRadius() >= Math.sqrt(l.distanceSquared(loc))) {
-                        if ((r.isOwner(player.getName()) || r.isMember(player.getName())) || effect.regionHasEffect(rt.getEffects(), "denyblockbuild") == 0 ||
-                                !effect.hasReagents(l))
-                            return;
-
-                        player.sendMessage(ChatColor.GRAY + "[HeroStronghold] This region is protected by a " + r.getType());
-                        event.setCancelled(true);
-                        return;
-                    }
-                }
-            }
+            
+            event.setCancelled(true);
+            event.getPlayer().sendMessage(ChatColor.GRAY + "[HeroStronghold] This region is protected");
+        }
+    }
+    
+    public class PListener extends EntityListener {
+        @Override
+        public void onPaintingPlace(PaintingPlaceEvent event) {
+            if (event.isCancelled() || !shouldTakeAction(event.getPainting().getLocation(), event.getPlayer()))
+                return;
+            
+            event.setCancelled(true);
+            event.getPlayer().sendMessage(ChatColor.GRAY + "[HeroStronghold] This region is protected");
+        }
+        
+        @Override
+        public void onEndermanPlace(EndermanPlaceEvent event) {
+            if (event.isCancelled() || !shouldTakeAction(event.getLocation(), null))
+                return;
+            event.setCancelled(true);
         }
     }
     
