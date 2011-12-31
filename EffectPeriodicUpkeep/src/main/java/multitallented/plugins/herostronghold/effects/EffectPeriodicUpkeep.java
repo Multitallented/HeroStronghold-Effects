@@ -1,10 +1,10 @@
 package main.java.multitallented.plugins.herostronghold.effects;
 
-import main.java.multitallented.plugins.herostronghold.Effect;
-import main.java.multitallented.plugins.herostronghold.HeroStronghold;
-import main.java.multitallented.plugins.herostronghold.Region;
-import main.java.multitallented.plugins.herostronghold.RegionType;
-import main.java.multitallented.plugins.herostronghold.UpkeepEvent;
+import multitallented.redcastlemedia.bukkit.herostronghold.HeroStronghold;
+import multitallented.redcastlemedia.bukkit.herostronghold.effect.Effect;
+import multitallented.redcastlemedia.bukkit.herostronghold.events.UpkeepEvent;
+import multitallented.redcastlemedia.bukkit.herostronghold.region.Region;
+import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionType;
 import org.bukkit.Location;
 import org.bukkit.event.CustomEventListener;
 import org.bukkit.event.Event;

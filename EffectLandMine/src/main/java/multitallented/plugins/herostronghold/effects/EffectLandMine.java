@@ -1,10 +1,11 @@
 package main.java.multitallented.plugins.herostronghold.effects;
 
 import java.util.ArrayList;
-import main.java.multitallented.plugins.herostronghold.Effect;
-import main.java.multitallented.plugins.herostronghold.HeroStronghold;
-import main.java.multitallented.plugins.herostronghold.PlayerInRegionEvent;
-import main.java.multitallented.plugins.herostronghold.RegionManager;
+import multitallented.redcastlemedia.bukkit.herostronghold.ConfigManager;
+import multitallented.redcastlemedia.bukkit.herostronghold.HeroStronghold;
+import multitallented.redcastlemedia.bukkit.herostronghold.effect.Effect;
+import multitallented.redcastlemedia.bukkit.herostronghold.events.PlayerInRegionEvent;
+import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionManager;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
@@ -19,8 +20,12 @@ import org.bukkit.event.Event.Type;
  * @author Multitallented
  */
 public class EffectLandMine extends Effect {
+    private final RegionManager rm;
+    private final ConfigManager cm;
     public EffectLandMine(HeroStronghold plugin) {
         super(plugin);
+        this.rm = plugin.getRegionManager();
+        this.cm = plugin.getConfigManager();
         registerEvent(Type.CUSTOM_EVENT, new IntruderListener(this), Priority.Highest);
     }
     
@@ -41,13 +46,15 @@ public class EffectLandMine extends Effect {
                 return;
             PlayerInRegionEvent pIREvent = (PlayerInRegionEvent) event;
             Player player = pIREvent.getPlayer();
+            
+            Location l = pIREvent.getRegionLocation();
+            ArrayList<String> effects = effect.rm.getRegionType(effect.rm.getRegion(l).getType()).getEffects();
 
             //Check if the region has the shoot arrow effect and return arrow velocity
-            int explode = effect.regionHasEffect(pIREvent.getEffects(), "landmine");
+            int explode = effect.regionHasEffect(effects, "landmine");
             if (explode == 0)
                 return;
             
-            Location l = pIREvent.getRegionLocation();
             
             //Check if the player owns or is a member of the region
             if (effect.isOwnerOfRegion(player, l) || effect.isMemberOfRegion(player, l)) {
@@ -63,7 +70,7 @@ public class EffectLandMine extends Effect {
             
             RegionManager rm = effect.getPlugin().getRegionManager();
             //Check to see if exploding regions are enabled
-            if (rm.hasExplode()) {
+            if (cm.getExplode()) {
                 rm.destroyRegion(l);
             } else {
                 rm.destroyRegion(l);

@@ -23,9 +23,10 @@ import org.bukkit.event.painting.PaintingPlaceEvent;
 public class EffectDenyBlockBuild extends Effect {
     public EffectDenyBlockBuild(HeroStronghold plugin) {
         super(plugin);
-        DenyBuildListener dbListener = new DenyBuildListener(this);
-        registerEvent(Type.BLOCK_PLACE, dbListener, Priority.Highest);
+        PListener pListener = new PListener();
+        registerEvent(Type.BLOCK_PLACE, new DenyBuildListener(), Priority.Highest);
         registerEvent(Type.PAINTING_PLACE, new PListener(), Priority.High);
+        registerEvent(Type.ENDERMAN_PLACE, pListener, Priority.High);
     }
     
     @Override
@@ -51,12 +52,6 @@ public class EffectDenyBlockBuild extends Effect {
     }
     
     public class DenyBuildListener extends BlockListener {
-        private final EffectDenyBlockBuild effect;
-        public DenyBuildListener(EffectDenyBlockBuild effect) {
-            this.effect = effect;
-        }
-        
-        
         @Override
         public void onBlockPlace(BlockPlaceEvent event) {
             if (event.isCancelled() || !shouldTakeAction(event.getBlock().getLocation(), event.getPlayer()))

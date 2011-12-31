@@ -1,8 +1,10 @@
 package main.java.multitallented.plugins.herostronghold.effects;
 
-import main.java.multitallented.plugins.herostronghold.Effect;
-import main.java.multitallented.plugins.herostronghold.HeroStronghold;
-import main.java.multitallented.plugins.herostronghold.PlayerInRegionEvent;
+import java.util.ArrayList;
+import multitallented.redcastlemedia.bukkit.herostronghold.HeroStronghold;
+import multitallented.redcastlemedia.bukkit.herostronghold.effect.Effect;
+import multitallented.redcastlemedia.bukkit.herostronghold.events.PlayerInRegionEvent;
+import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionManager;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.event.CustomEventListener;
@@ -15,8 +17,10 @@ import org.bukkit.event.Event.Type;
  * @author Multitallented
  */
 public class EffectGainStamina extends Effect {
+    private final RegionManager rm;
     public EffectGainStamina(HeroStronghold plugin) {
         super(plugin);
+        this.rm = plugin.getRegionManager();
         registerEvent(Type.CUSTOM_EVENT, new IntruderListener(this), Priority.Highest);
     }
     
@@ -39,12 +43,14 @@ public class EffectGainStamina extends Effect {
             Player player = pIREvent.getPlayer();
             if (player.getFoodLevel() == 20)
                 return;
+            
+            Location l = pIREvent.getRegionLocation();
+            ArrayList<String> effects = effect.rm.getRegionType(effect.rm.getRegion(l).getType()).getEffects();
             //Check if the region has the shoot arrow effect and return arrow velocity
-            int food = effect.regionHasEffect(pIREvent.getEffects(), "gainstamina");
+            int food = effect.regionHasEffect(effects, "gainstamina");
             if (food == 0)
                 return;
             
-            Location l = pIREvent.getRegionLocation();
             
             //Check if the player owns or is a member of the region
             if (!effect.isOwnerOfRegion(player, l) && !effect.isMemberOfRegion(player, l)) {

@@ -42,6 +42,7 @@ public class EffectDenyBlockBreak extends Effect {
     public EffectDenyBlockBreak(HeroStronghold plugin) {
         super(plugin);
         DenyBuildListener dbListener = new DenyBuildListener();
+        PListener pListener = new PListener();
         registerEvent(Type.BLOCK_BREAK, dbListener, Priority.Highest);
         registerEvent(Type.BLOCK_DAMAGE, dbListener, Priority.High);
         registerEvent(Type.BLOCK_FROMTO, dbListener, Priority.Normal);
@@ -50,7 +51,10 @@ public class EffectDenyBlockBreak extends Effect {
         registerEvent(Type.SIGN_CHANGE, dbListener, Priority.High);
         registerEvent(Type.BLOCK_PISTON_EXTEND, dbListener, Priority.High);
         registerEvent(Type.BLOCK_PISTON_RETRACT, dbListener, Priority.High);
-        registerEvent(Type.PAINTING_BREAK, new PListener(), Priority.High);
+        registerEvent(Type.PAINTING_BREAK, pListener, Priority.High);
+        registerEvent(Type.EXPLOSION_PRIME, pListener, Priority.High);
+        registerEvent(Type.ENTITY_EXPLODE, pListener, Priority.High);
+        registerEvent(Type.ENDERMAN_PICKUP, pListener, Priority.High);
     }
     
     @Override

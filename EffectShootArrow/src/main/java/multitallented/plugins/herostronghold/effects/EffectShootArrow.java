@@ -1,8 +1,9 @@
 package main.java.multitallented.plugins.herostronghold.effects;
 
-import main.java.multitallented.plugins.herostronghold.Effect;
-import main.java.multitallented.plugins.herostronghold.HeroStronghold;
-import main.java.multitallented.plugins.herostronghold.PlayerInRegionEvent;
+import multitallented.redcastlemedia.bukkit.herostronghold.HeroStronghold;
+import multitallented.redcastlemedia.bukkit.herostronghold.effect.Effect;
+import multitallented.redcastlemedia.bukkit.herostronghold.events.PlayerInRegionEvent;
+import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionManager;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Arrow;
@@ -18,8 +19,10 @@ import org.bukkit.util.Vector;
  * @author Multitallented
  */
 public class EffectShootArrow extends Effect {
+    private final RegionManager rm;
     public EffectShootArrow(HeroStronghold plugin) {
         super(plugin);
+        this.rm = plugin.getRegionManager();
         registerEvent(Type.CUSTOM_EVENT, new IntruderListener(this), Priority.Highest);
     }
     
@@ -40,13 +43,13 @@ public class EffectShootArrow extends Effect {
                 return;
             PlayerInRegionEvent pIREvent = (PlayerInRegionEvent) event;
             
+            Location l = pIREvent.getRegionLocation();
             //Check if the region has the shoot arrow effect and return arrow velocity
-            double speed = effect.regionHasEffect(pIREvent.getEffects(), "shootarrow") / 10;
+            double speed = effect.regionHasEffect(effect.rm.getRegionType(effect.rm.getRegion(l).getType()).getEffects(), "shootarrow") / 10;
             if (speed == 0)
                 return;
             
             Player player = pIREvent.getPlayer();
-            Location l = pIREvent.getRegionLocation();
             
             //Check if the player owns or is a member of the region
             if (effect.isOwnerOfRegion(player, l) || effect.isMemberOfRegion(player, l)) {

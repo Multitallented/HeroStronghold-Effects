@@ -1,11 +1,11 @@
 package main.java.multitallented.plugins.herostronghold.effects;
 
-import main.java.multitallented.plugins.herostronghold.Effect;
-import main.java.multitallented.plugins.herostronghold.HeroStronghold;
-import main.java.multitallented.plugins.herostronghold.PlayerInRegionEvent;
-import main.java.multitallented.plugins.herostronghold.Region;
-import main.java.multitallented.plugins.herostronghold.RegionManager;
-import main.java.multitallented.plugins.herostronghold.RegionType;
+import multitallented.redcastlemedia.bukkit.herostronghold.effect.Effect;
+import multitallented.redcastlemedia.bukkit.herostronghold.HeroStronghold;
+import multitallented.redcastlemedia.bukkit.herostronghold.events.PlayerInRegionEvent;
+import multitallented.redcastlemedia.bukkit.herostronghold.region.Region;
+import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionManager;
+import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionType;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.block.BlockFace;
@@ -35,7 +35,7 @@ public class EffectTeleport extends Effect {
         public TeleportListener(EffectTeleport effect) {
             this.effect = effect;
         }
-        
+        //TODO add sign data so that I can switch exit teleporters with a sign
         
         @Override
         public void onCustomEvent(Event event) {
