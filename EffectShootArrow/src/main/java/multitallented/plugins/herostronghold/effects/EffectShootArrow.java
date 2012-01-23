@@ -69,7 +69,7 @@ public class EffectShootArrow extends Effect {
             Vector vel = new Vector(playerLoc.getX() - loc.getX(), playerLoc.getY() - loc.getY(), playerLoc.getZ() - loc.getZ());
             
             //Spawn and set velocity of the arrow
-            Arrow arrow = l.getWorld().spawn(loc, Arrow.class);
+            Arrow arrow = l.getWorld().spawnArrow(loc, vel, (float) (0.6 * speed), 12);
             arrow.setVelocity(vel.multiply(speed));
         }
     }

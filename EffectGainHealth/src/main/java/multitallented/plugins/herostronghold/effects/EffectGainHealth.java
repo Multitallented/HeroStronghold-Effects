@@ -14,6 +14,8 @@ import org.bukkit.event.CustomEventListener;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
+import org.bukkit.event.entity.EntityRegainHealthEvent;
+import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 
 /**
  *
@@ -45,7 +47,7 @@ public class EffectGainHealth extends Effect {
             PlayerInRegionEvent pIREvent = (PlayerInRegionEvent) event;
             Player player = pIREvent.getPlayer();
             Hero hero = null;
-            Heroes heroes = effect.aPlugin.getHeroes();
+            Heroes heroes = HeroStronghold.heroes;
             if (heroes != null)
                 hero = heroes.getHeroManager().getHero(player);
             if (hero == null) {
@@ -66,9 +68,7 @@ public class EffectGainHealth extends Effect {
                 return;
             
             //Check if the player owns or is a member of the region
-            if (!effect.isOwnerOfRegion(player, l) && !effect.isMemberOfRegion(player, l) && hero == null) {
-                return;
-            } else if (hero != null && !rt.containsFriendlyClass(hero.getHeroClass().getName())) {
+            if (!effect.isOwnerOfRegion(player, l) && !effect.isMemberOfRegion(player, l)) {
                 return;
             }
             
@@ -79,18 +79,9 @@ public class EffectGainHealth extends Effect {
             //Run upkeep but don't need to know if upkeep occured
             effect.forceUpkeep(l);
             
-            //grant the player food
-            if (hero == null) {
-                if (player.getHealth() + addHealth <= 20) {
-                    player.setHealth(player.getHealth() + addHealth);
-                } else {
-                    player.setHealth(20);
-                }
-            } else if (hero.getHealth() + addHealth <= hero.getMaxHealth()) {
-                hero.setHealth(hero.getHealth() + addHealth);
-            } else {
-                hero.setHealth(hero.getMaxHealth());
-            }
+            //grant the player hp
+            EntityRegainHealthEvent e = new EntityRegainHealthEvent(player, addHealth, RegainReason.CUSTOM);
+            effect.aPlugin.getServer().getPluginManager().callEvent(e);
         }
     }
     

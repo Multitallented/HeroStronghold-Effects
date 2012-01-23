@@ -7,9 +7,8 @@ import multitallented.redcastlemedia.bukkit.herostronghold.effect.Effect;
 import multitallented.redcastlemedia.bukkit.herostronghold.events.PlayerInRegionEvent;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionManager;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.CustomEventListener;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
@@ -74,8 +73,10 @@ public class EffectLandMine extends Effect {
                 rm.destroyRegion(l);
             } else {
                 rm.destroyRegion(l);
-                l.getBlock().setTypeId(46);
-                l.getBlock().getRelative(BlockFace.DOWN).setType(Material.REDSTONE_TORCH_ON);
+                l.getBlock().setTypeId(0);
+                TNTPrimed tnt = l.getWorld().spawn(l, TNTPrimed.class);
+                tnt.setFuseTicks(1);
+                //l.getBlock().getRelative(BlockFace.DOWN).setType(Material.REDSTONE_TORCH_ON);
             }
             
             //Set the event to destroy the region

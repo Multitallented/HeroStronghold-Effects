@@ -103,24 +103,33 @@ public class EffectPeriodicFarm extends Effect {
                 case 16:
                    ct = CreatureType.PIG_ZOMBIE;
                    break;
+                case 17:
+                   ct = CreatureType.BLAZE;
+                   break;
+                case 18:
+                   ct = CreatureType.VILLAGER;
+                   break;
             }
             
-            int radius = rt.getRadius();
+            /*int radius = rt.getRadius();
             int i = 0;
             for (Entity e : pirEvent.getPlayer().getNearbyEntities(radius, radius, radius)) {
                 if (e instanceof Creature) {
                     i++;
                 }
             }
-            if (i > 7)
+            if (i > 7) {
                 return;
+            }*/
             
             //Check to see if the HeroStronghold has enough reagents
-            if (!effect.hasReagents(l))
+            if (!effect.hasReagents(l)) {
                 return;
+            }
             //Check for upkeep
-            if (!effect.upkeep(l))
+            if (!effect.upkeep(l)) {
                 return;
+            }
             
             l.getWorld().spawnCreature(l.getBlock().getRelative(BlockFace.UP).getLocation(), ct);
         }
