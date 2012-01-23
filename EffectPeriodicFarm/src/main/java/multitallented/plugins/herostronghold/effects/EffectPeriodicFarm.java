@@ -10,6 +10,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Creature;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.event.CustomEventListener;
 import org.bukkit.event.Event;
 import org.bukkit.event.Event.Priority;
@@ -39,14 +40,22 @@ public class EffectPeriodicFarm extends Effect {
         
         @Override
         public void onCustomEvent(Event event) {
-            if (!(event instanceof PlayerInRegionEvent))
+            if (!(event instanceof PlayerInRegionEvent)) {
                 return;
+            }
             PlayerInRegionEvent pirEvent = (PlayerInRegionEvent) event;
             Location l = pirEvent.getRegionLocation();
             Region r = getPlugin().getRegionManager().getRegion(pirEvent.getRegionLocation());
-            if (r == null)
+            if (r == null) {
                 return;
+            }
             RegionType rt = getPlugin().getRegionManager().getRegionType(r.getType()); 
+            
+            //Check if player is member or owner
+            Player p = pirEvent.getPlayer();
+            if (!r.isMember(p.getName()) && !r.isOwner(p.getName())) {
+                return;
+            }
             
             //Check if the region has the periodic farm effect
             int animalType = effect.regionHasEffect(rt.getEffects(), "periodicfarm");
@@ -110,8 +119,10 @@ public class EffectPeriodicFarm extends Effect {
                    ct = CreatureType.VILLAGER;
                    break;
             }
-            
-            /*int radius = rt.getRadius();
+            if (ct == null) {
+                return;
+            }
+            int radius = (int) Math.sqrt(rt.getRadius());
             int i = 0;
             for (Entity e : pirEvent.getPlayer().getNearbyEntities(radius, radius, radius)) {
                 if (e instanceof Creature) {
@@ -120,7 +131,7 @@ public class EffectPeriodicFarm extends Effect {
             }
             if (i > 7) {
                 return;
-            }*/
+            }
             
             //Check to see if the HeroStronghold has enough reagents
             if (!effect.hasReagents(l)) {
@@ -130,7 +141,6 @@ public class EffectPeriodicFarm extends Effect {
             if (!effect.upkeep(l)) {
                 return;
             }
-            
             l.getWorld().spawnCreature(l.getBlock().getRelative(BlockFace.UP).getLocation(), ct);
         }
     }
