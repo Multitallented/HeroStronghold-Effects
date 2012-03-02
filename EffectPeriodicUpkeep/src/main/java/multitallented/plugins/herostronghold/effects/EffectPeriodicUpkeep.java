@@ -6,10 +6,9 @@ import multitallented.redcastlemedia.bukkit.herostronghold.events.UpkeepEvent;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.Region;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionType;
 import org.bukkit.Location;
-import org.bukkit.event.CustomEventListener;
 import org.bukkit.event.Event;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event.Type;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 
 /**
  *
@@ -18,7 +17,7 @@ import org.bukkit.event.Event.Type;
 public class EffectPeriodicUpkeep extends Effect {
     public EffectPeriodicUpkeep(HeroStronghold plugin) {
         super(plugin);
-        registerEvent(Type.CUSTOM_EVENT, new UpkeepListener(this), Priority.Highest);
+        registerEvent(new UpkeepListener(this));
     }
     
     @Override
@@ -26,14 +25,14 @@ public class EffectPeriodicUpkeep extends Effect {
         super.init(plugin);
     }
     
-    public class UpkeepListener extends CustomEventListener {
+    public class UpkeepListener implements Listener {
         private final EffectPeriodicUpkeep effect;
         public UpkeepListener(EffectPeriodicUpkeep effect) {
             this.effect = effect;
         }
         
         
-        @Override
+        @EventHandler
         public void onCustomEvent(Event event) {
             if (!(event instanceof UpkeepEvent))
                 return;

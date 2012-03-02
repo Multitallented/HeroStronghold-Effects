@@ -8,10 +8,8 @@ import multitallented.redcastlemedia.bukkit.herostronghold.events.UpkeepEvent;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.Region;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionType;
 import org.bukkit.Location;
-import org.bukkit.event.CustomEventListener;
-import org.bukkit.event.Event;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event.Type;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 
 /**
  *
@@ -22,7 +20,7 @@ public class EffectScheduledUpkeep extends Effect {
     
     public EffectScheduledUpkeep(HeroStronghold plugin) {
         super(plugin);
-        registerEvent(Type.CUSTOM_EVENT, new UpkeepListener(this), Priority.Highest);
+        registerEvent(new UpkeepListener(this));
     }
     
     @Override
@@ -30,20 +28,17 @@ public class EffectScheduledUpkeep extends Effect {
         super.init(plugin);
     }
     
-    public class UpkeepListener extends CustomEventListener {
+    public class UpkeepListener implements Listener {
         private final EffectScheduledUpkeep effect;
         public UpkeepListener(EffectScheduledUpkeep effect) {
             this.effect = effect;
         }
         
         
-        @Override
-        public void onCustomEvent(Event event) {
-            if (!(event instanceof UpkeepEvent))
-                return;
-            UpkeepEvent uEvent = (UpkeepEvent) event;
-            Location l = uEvent.getRegionLocation();
-            Region r = getPlugin().getRegionManager().getRegion(uEvent.getRegionLocation());
+        @EventHandler
+        public void onCustomEvent(UpkeepEvent event) {
+            Location l = event.getRegionLocation();
+            Region r = getPlugin().getRegionManager().getRegion(event.getRegionLocation());
             if (r == null)
                 return;
             RegionType rt = getPlugin().getRegionManager().getRegionType(r.getType()); 

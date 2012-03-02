@@ -8,10 +8,9 @@ import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionManager;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionType;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.event.CustomEventListener;
 import org.bukkit.event.Event;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event.Type;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.util.Vector;
 
 /**
@@ -21,7 +20,7 @@ import org.bukkit.util.Vector;
 public class EffectManCannon extends Effect {
     public EffectManCannon(HeroStronghold plugin) {
         super(plugin);
-        registerEvent(Type.CUSTOM_EVENT, new TeleportListener(this), Priority.Highest);
+        registerEvent(new TeleportListener(this));
     }
     
     @Override
@@ -29,14 +28,14 @@ public class EffectManCannon extends Effect {
         super.init(plugin);
     }
     
-    public class TeleportListener extends CustomEventListener {
+    public class TeleportListener implements Listener {
         private final EffectManCannon effect;
         public TeleportListener(EffectManCannon effect) {
             this.effect = effect;
         }
         
         
-        @Override
+        @EventHandler
         public void onCustomEvent(Event event) {
             if (!(event instanceof PlayerInRegionEvent))
                 return;

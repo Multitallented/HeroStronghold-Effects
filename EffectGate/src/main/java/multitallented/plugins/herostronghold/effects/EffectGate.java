@@ -14,12 +14,10 @@ import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event.Type;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerListener;
 import org.bukkit.event.server.PluginDisableEvent;
-import org.bukkit.event.server.ServerListener;
 
 /**
  *
@@ -32,8 +30,8 @@ public class EffectGate extends Effect {
     public EffectGate(HeroStronghold plugin) {
         super(plugin);
         this.rm = plugin.getRegionManager();
-        registerEvent(Type.PLAYER_INTERACT, new IntruderListener(this), Priority.Normal);
-        registerEvent(Type.PLUGIN_DISABLE, new CloseGateListener(), Priority.Normal);
+        registerEvent(new IntruderListener(this));
+        registerEvent(new CloseGateListener());
         //registerEvent(Type.CUSTOM_EVENT, new GateDestroyedListener(), Priority.Normal);
     }
     
@@ -61,8 +59,8 @@ public class EffectGate extends Effect {
         }
     }*/
     
-    public class CloseGateListener extends ServerListener {
-        @Override
+    public class CloseGateListener implements Listener {
+        @EventHandler
         public void onPluginDisable(PluginDisableEvent event) {
             //Close gates if the plugin is going to be disabled
             if (event.getPlugin().getDescription().getName().equals("HeroStronghold")) {
@@ -75,13 +73,13 @@ public class EffectGate extends Effect {
         }
     }
     
-    public class IntruderListener extends PlayerListener {
+    public class IntruderListener implements Listener {
         private final EffectGate effect;
         public IntruderListener(EffectGate effect) {
             this.effect = effect;
         }
         
-        @Override
+        @EventHandler
         public void onPlayerInteract(PlayerInteractEvent event) {
             Block block = event.getClickedBlock();
             //Check if a sign
@@ -184,7 +182,7 @@ public class EffectGate extends Effect {
                 gates.put(loc, tempSet);
             }
             
-            //TODO open or close the gate
+            event.setCancelled(true);
             if (openGates.contains(loc)) {
                 //Gate is open
                 for (Block b : gates.get(loc)) {

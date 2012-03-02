@@ -10,10 +10,9 @@ import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionManager;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionType;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.event.CustomEventListener;
 import org.bukkit.event.Event;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event.Type;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityRegainHealthEvent;
 import org.bukkit.event.entity.EntityRegainHealthEvent.RegainReason;
 
@@ -26,7 +25,7 @@ public class EffectGainHealth extends Effect {
     public EffectGainHealth(HeroStronghold plugin) {
         super(plugin);
         this.aPlugin = plugin;
-        registerEvent(Type.CUSTOM_EVENT, new IntruderListener(this), Priority.Highest);
+        registerEvent(new IntruderListener(this));
     }
     
     @Override
@@ -34,13 +33,13 @@ public class EffectGainHealth extends Effect {
         super.init(plugin);
     }
     
-    public class IntruderListener extends CustomEventListener {
+    public class IntruderListener implements Listener {
         private final EffectGainHealth effect;
         public IntruderListener(EffectGainHealth effect) {
             this.effect = effect;
         }
         
-        @Override
+        @EventHandler
         public void onCustomEvent(Event event) {
             if (!(event instanceof PlayerInRegionEvent))
                 return;

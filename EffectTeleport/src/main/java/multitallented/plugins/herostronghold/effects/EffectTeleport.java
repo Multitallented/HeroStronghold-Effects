@@ -8,21 +8,21 @@ import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionManager;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionType;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Player;
-import org.bukkit.event.CustomEventListener;
-import org.bukkit.event.Event;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event.Type;
+import org.bukkit.block.Sign;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 
 /**
  *
  * @author Multitallented
  */
 public class EffectTeleport extends Effect {
+    
     public EffectTeleport(HeroStronghold plugin) {
         super(plugin);
-        registerEvent(Type.CUSTOM_EVENT, new TeleportListener(this), Priority.Highest);
+        registerEvent(new TeleportListener(this));
     }
     
     @Override
@@ -30,46 +30,67 @@ public class EffectTeleport extends Effect {
         super.init(plugin);
     }
     
-    public class TeleportListener extends CustomEventListener {
+    public class TeleportListener implements Listener {
         private final EffectTeleport effect;
         public TeleportListener(EffectTeleport effect) {
             this.effect = effect;
         }
         //TODO add sign data so that I can switch exit teleporters with a sign
         
-        @Override
-        public void onCustomEvent(Event event) {
-            if (!(event instanceof PlayerInRegionEvent))
+        @EventHandler
+        public void onCustomEvent(PlayerInRegionEvent event) {
+            if (!event.getRegionLocation().getBlock().getRelative(BlockFace.UP).equals(event.getPlayer().getLocation().getBlock())) {
                 return;
-            PlayerInRegionEvent pIREvent = (PlayerInRegionEvent) event;
-            if (!pIREvent.getRegionLocation().getBlock().getRelative(BlockFace.UP).equals(pIREvent.getPlayer().getLocation().getBlock()))
-                return;
-            Location l = pIREvent.getRegionLocation();
+            }
+            Location l = event.getRegionLocation();
             RegionManager rm = getPlugin().getRegionManager();
             Region r = rm.getRegion(l);
             RegionType rt = rm.getRegionType(r.getType());
             
             //Check if the region is a teleporter
-            if (effect.regionHasEffect(rt.getEffects(), "teleport") == 0)
+            if (effect.regionHasEffect(rt.getEffects(), "teleport") == 0) {
                 return;
+            }
             
-            //Check if there is another teleporter owned by that player
-            String owner = r.getOwners().get(0);
-            Location targetLoc = null;
-            for (Location loc : rm.getRegionLocations()) {
-                Region targetR = rm.getRegion(loc);
-                if (!targetR.getOwners().isEmpty() && targetR.getOwners().get(0).equals(owner) && targetR != rm.getRegion(l)) {
-                    RegionType targetRT = rm.getRegionType(targetR.getType());
-                    if (effect.regionHasEffect(targetRT.getEffects(), "teleport") != 0)
-                        targetLoc = loc;
+            Block block = l.getBlock().getRelative(BlockFace.UP);
+            if (!(block.getState() instanceof Sign)) {
+                return;
+            }
+
+            Sign sign = (Sign) block.getState();
+            if (!sign.getLine(0).equalsIgnoreCase("[Teleport]")) {
+                return;
+            }
+            Region currentRegion = null;
+            try {
+                currentRegion = rm.getRegionByID(Integer.parseInt(sign.getLine(1)));
+            } catch (Exception e) {
+                return;
+            }
+            if (currentRegion == null) {
+                return;
+            }
+            
+            if (r.getOwners().isEmpty() || currentRegion.getOwners().isEmpty()) {
+                return;
+            }
+            //TODO add more error messages
+            boolean ownerCheck = false;
+            for (String s : r.getOwners()) {
+                if (currentRegion.isOwner(s)) {
+                    ownerCheck = true;
+                    break;
                 }
             }
-            
-            Player player = pIREvent.getPlayer();
-            if (targetLoc == null) {
-                player.sendMessage(ChatColor.GRAY + "[HeroStronghold] There is no exit teleporter owned by " + owner);
+            if (!ownerCheck) {
                 return;
             }
+            
+            if (effect.regionHasEffect(rm.getRegionType(currentRegion.getType()).getEffects(), "teleport") == 0) {
+                return;
+            }
+            
+            Location targetLoc = currentRegion.getLocation();
             
             
             //Check to see if the HeroStronghold has enough reagents
@@ -78,7 +99,8 @@ public class EffectTeleport extends Effect {
             
             //Run upkeep but don't need to know if upkeep occured
             effect.forceUpkeep(l);
-            player.teleport(targetLoc.getBlock().getRelative(BlockFace.NORTH, 2).getLocation());
+            event.getPlayer().teleport(targetLoc.getBlock().getRelative(BlockFace.NORTH, 2).getLocation());
+            event.getPlayer().sendMessage(ChatColor.GOLD + "[HeroStronghold] You have been teleported!");
         }
     }
     

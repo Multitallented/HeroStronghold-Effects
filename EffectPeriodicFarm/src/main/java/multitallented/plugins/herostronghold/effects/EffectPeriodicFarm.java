@@ -11,10 +11,9 @@ import org.bukkit.entity.Creature;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.CustomEventListener;
 import org.bukkit.event.Event;
-import org.bukkit.event.Event.Priority;
-import org.bukkit.event.Event.Type;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 
 /**
  *
@@ -23,7 +22,7 @@ import org.bukkit.event.Event.Type;
 public class EffectPeriodicFarm extends Effect {
     public EffectPeriodicFarm(HeroStronghold plugin) {
         super(plugin);
-        registerEvent(Type.CUSTOM_EVENT, new PlayerInRegionListener(this), Priority.Highest);
+        registerEvent(new PlayerInRegionListener(this));
     }
     
     @Override
@@ -31,14 +30,14 @@ public class EffectPeriodicFarm extends Effect {
         super.init(plugin);
     }
     
-    public class PlayerInRegionListener extends CustomEventListener {
+    public class PlayerInRegionListener implements Listener {
         private final EffectPeriodicFarm effect;
         public PlayerInRegionListener(EffectPeriodicFarm effect) {
             this.effect = effect;
         }
         
         
-        @Override
+        @EventHandler
         public void onCustomEvent(Event event) {
             if (!(event instanceof PlayerInRegionEvent)) {
                 return;
