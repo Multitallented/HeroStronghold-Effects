@@ -33,12 +33,9 @@ public class EffectPeriodicUpkeep extends Effect {
         
         
         @EventHandler
-        public void onCustomEvent(Event event) {
-            if (!(event instanceof UpkeepEvent))
-                return;
-            UpkeepEvent uEvent = (UpkeepEvent) event;
-            Location l = uEvent.getRegionLocation();
-            Region r = getPlugin().getRegionManager().getRegion(uEvent.getRegionLocation());
+        public void onCustomEvent(UpkeepEvent event) {
+            Location l = event.getRegionLocation();
+            Region r = getPlugin().getRegionManager().getRegion(event.getRegionLocation());
             if (r == null)
                 return;
             RegionType rt = getPlugin().getRegionManager().getRegionType(r.getType()); 

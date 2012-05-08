@@ -7,7 +7,6 @@ import multitallented.redcastlemedia.bukkit.herostronghold.events.PlayerInRegion
 import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionManager;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 /**
@@ -34,15 +33,12 @@ public class EffectGainStamina extends Effect {
         }
         
         @EventHandler
-        public void onCustomEvent(Event event) {
-            if (!(event instanceof PlayerInRegionEvent))
-                return;
-            PlayerInRegionEvent pIREvent = (PlayerInRegionEvent) event;
-            Player player = pIREvent.getPlayer();
+        public void onCustomEvent(PlayerInRegionEvent event) {
+            Player player = event.getPlayer();
             if (player.getFoodLevel() == 20)
                 return;
             
-            Location l = pIREvent.getRegionLocation();
+            Location l = event.getRegionLocation();
             ArrayList<String> effects = effect.rm.getRegionType(effect.rm.getRegion(l).getType()).getEffects();
             //Check if the region has the shoot arrow effect and return arrow velocity
             int food = effect.regionHasEffect(effects, "gainstamina");

@@ -9,7 +9,6 @@ import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionManager;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -39,13 +38,10 @@ public class EffectLandMine extends Effect {
         }
         
         @EventHandler
-        public void onCustomEvent(Event event) {
-            if (!(event instanceof PlayerInRegionEvent))
-                return;
-            PlayerInRegionEvent pIREvent = (PlayerInRegionEvent) event;
-            Player player = pIREvent.getPlayer();
+        public void onCustomEvent(PlayerInRegionEvent event) {
+            Player player = event.getPlayer();
             
-            Location l = pIREvent.getRegionLocation();
+            Location l = event.getRegionLocation();
             ArrayList<String> effects = effect.rm.getRegionType(effect.rm.getRegion(l).getType()).getEffects();
 
             //Check if the region has the shoot arrow effect and return arrow velocity
@@ -81,7 +77,7 @@ public class EffectLandMine extends Effect {
             //Set the event to destroy the region
             ArrayList<Location> tempArray = new ArrayList<Location>();
             tempArray.add(l);
-            pIREvent.setRegionsToDestroy(tempArray);
+            event.setRegionsToDestroy(tempArray);
         }
     }
     

@@ -8,7 +8,6 @@ import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionManager;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionType;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.util.Vector;
@@ -36,11 +35,8 @@ public class EffectManCannon extends Effect {
         
         
         @EventHandler
-        public void onCustomEvent(Event event) {
-            if (!(event instanceof PlayerInRegionEvent))
-                return;
-            PlayerInRegionEvent pIREvent = (PlayerInRegionEvent) event;
-            Location l = pIREvent.getRegionLocation();
+        public void onCustomEvent(PlayerInRegionEvent event) {
+            Location l = event.getRegionLocation();
             RegionManager rm = getPlugin().getRegionManager();
             Region r = rm.getRegion(l);
             if (r == null)
@@ -62,7 +58,7 @@ public class EffectManCannon extends Effect {
             
             
             //Launch the player into the air
-            Player player = pIREvent.getPlayer();
+            Player player = event.getPlayer();
             float pitch = player.getEyeLocation().getPitch();
             int jumpForwards = 1;
             if (pitch > 45) {

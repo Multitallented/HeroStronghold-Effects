@@ -11,7 +11,6 @@ import org.bukkit.entity.Creature;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -38,20 +37,16 @@ public class EffectPeriodicFarm extends Effect {
         
         
         @EventHandler
-        public void onCustomEvent(Event event) {
-            if (!(event instanceof PlayerInRegionEvent)) {
-                return;
-            }
-            PlayerInRegionEvent pirEvent = (PlayerInRegionEvent) event;
-            Location l = pirEvent.getRegionLocation();
-            Region r = getPlugin().getRegionManager().getRegion(pirEvent.getRegionLocation());
+        public void onCustomEvent(PlayerInRegionEvent event) {
+            Location l = event.getRegionLocation();
+            Region r = getPlugin().getRegionManager().getRegion(event.getRegionLocation());
             if (r == null) {
                 return;
             }
             RegionType rt = getPlugin().getRegionManager().getRegionType(r.getType()); 
             
             //Check if player is member or owner
-            Player p = pirEvent.getPlayer();
+            Player p = event.getPlayer();
             if (!r.isMember(p.getName()) && !r.isOwner(p.getName())) {
                 return;
             }
@@ -123,7 +118,7 @@ public class EffectPeriodicFarm extends Effect {
             }
             int radius = (int) Math.sqrt(rt.getRadius());
             int i = 0;
-            for (Entity e : pirEvent.getPlayer().getNearbyEntities(radius, radius, radius)) {
+            for (Entity e : event.getPlayer().getNearbyEntities(radius, radius, radius)) {
                 if (e instanceof Creature) {
                     i++;
                 }

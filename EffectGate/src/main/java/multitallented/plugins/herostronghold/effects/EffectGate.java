@@ -92,7 +92,7 @@ public class EffectGate extends Effect {
             }
             //Check if its a gate sign
             Sign sign = (Sign) block.getState();
-            if (!sign.getLine(0).equals("[Gate]")) {
+            if (!sign.getLine(0).equalsIgnoreCase("[Gate]")) {
                 return;
             }
             
@@ -151,7 +151,7 @@ public class EffectGate extends Effect {
 
                 int upperRightX = (int) loc.getX() + radius;
                 int upperRightY = (int) loc.getY() + radius;
-                upperRightY = upperRightY > 128 ? 128 : upperRightY;
+                upperRightY = upperRightY > 255 ? 255 : upperRightY;
                 int upperRightZ = (int) loc.getZ() + radius;
                 
                 World world = loc.getWorld();

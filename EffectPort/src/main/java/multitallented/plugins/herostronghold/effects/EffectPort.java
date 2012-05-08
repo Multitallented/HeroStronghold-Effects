@@ -1,6 +1,6 @@
 package main.java.multitallented.plugins.herostronghold.effects;
 
-import com.herocraftonline.dev.heroes.hero.Hero;
+import com.herocraftonline.heroes.characters.Hero;
 import java.io.File;
 import java.util.HashMap;
 import multitallented.redcastlemedia.bukkit.herostronghold.effect.Effect;
@@ -101,7 +101,7 @@ public class EffectPort extends Effect {
             Hero hero = null;
             Economy econ = HeroStronghold.econ;
             if (HeroStronghold.heroes != null) {
-                hero = HeroStronghold.heroes.getHeroManager().getHero(player);
+                hero = HeroStronghold.heroes.getCharacterManager().getHero(player);
             }
             
             //Check if on cooldown
