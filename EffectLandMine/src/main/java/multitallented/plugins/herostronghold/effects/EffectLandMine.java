@@ -22,7 +22,7 @@ public class EffectLandMine extends Effect {
     public EffectLandMine(HeroStronghold plugin) {
         super(plugin);
         this.rm = plugin.getRegionManager();
-        this.cm = plugin.getConfigManager();
+        this.cm = HeroStronghold.getConfigManager();
         registerEvent(new IntruderListener(this));
     }
     
