@@ -3,8 +3,8 @@ package main.java.multitallented.plugins.herostronghold.effects;
 import com.herocraftonline.heroes.characters.Hero;
 import java.io.File;
 import java.util.HashMap;
-import multitallented.redcastlemedia.bukkit.herostronghold.effect.Effect;
 import multitallented.redcastlemedia.bukkit.herostronghold.HeroStronghold;
+import multitallented.redcastlemedia.bukkit.herostronghold.effect.Effect;
 import multitallented.redcastlemedia.bukkit.herostronghold.events.CommandEffectEvent;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.Region;
 import net.milkbowl.vault.economy.Economy;
@@ -184,7 +184,7 @@ public class EffectPort extends Effect {
                     if (!p.isOnline() || p.isDead()) {
                         return;
                     }
-                    p.teleport(l);
+                    p.teleport(new Location(l.getWorld(), l.getX(), l.getY() + 1, l.getZ()));
                     if (mana > 0) {
                         h.setMana(h.getMana() - mana);
                     }

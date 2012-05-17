@@ -1,7 +1,7 @@
 package main.java.multitallented.plugins.herostronghold.effects;
 
-import multitallented.redcastlemedia.bukkit.herostronghold.effect.Effect;
 import multitallented.redcastlemedia.bukkit.herostronghold.HeroStronghold;
+import multitallented.redcastlemedia.bukkit.herostronghold.effect.Effect;
 import multitallented.redcastlemedia.bukkit.herostronghold.events.PlayerInRegionEvent;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.Region;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionManager;
@@ -99,7 +99,7 @@ public class EffectTeleport extends Effect {
             
             //Run upkeep but don't need to know if upkeep occured
             effect.forceUpkeep(l);
-            event.getPlayer().teleport(targetLoc.getBlock().getRelative(BlockFace.NORTH, 2).getLocation());
+            event.getPlayer().teleport(targetLoc.getBlock().getRelative(BlockFace.NORTH, 2).getRelative(BlockFace.UP).getLocation());
             event.getPlayer().sendMessage(ChatColor.GOLD + "[HeroStronghold] You have been teleported!");
         }
     }
