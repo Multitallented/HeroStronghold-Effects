@@ -85,8 +85,12 @@ public class EffectConveyorBelt extends Effect {
                     HashSet<ItemStack> cartInventory = new HashSet<ItemStack>();
                     cartInventory.addAll(Arrays.asList(sm.getInventory().getContents()));
                     for (ItemStack is : cartInventory) {
-                        sm.getInventory().remove(is);
-                        currentChest.getInventory().addItem(is);
+                        try {
+                            sm.getInventory().remove(is);
+                            currentChest.getInventory().addItem(is);
+                        } catch (NullPointerException npe) {
+                          
+                        }
                     }
                     if (conveyor > 1) {
                         currentChest.getInventory().addItem(new ItemStack(Material.STORAGE_MINECART, 1));
@@ -141,6 +145,9 @@ public class EffectConveyorBelt extends Effect {
             
             
             HashSet<ItemStack> iss = new HashSet<ItemStack>();
+            if (rt.getOutput().isEmpty()) {
+                return;
+            }
             
             if (conveyor > 1) {
                 if (!cInv.contains(Material.STORAGE_MINECART)) {
@@ -148,20 +155,17 @@ public class EffectConveyorBelt extends Effect {
                 } else {
                     ItemStack tempCart = new ItemStack(Material.STORAGE_MINECART, 1);
                     cInv.remove(tempCart);
-                    iss.add(tempCart);
                 }
             }
             
-            if (!rt.getOutput().isEmpty()) {
-                for (ItemStack is : rt.getOutput()) {
-                    if (cInv.contains(is)) {
-                        cInv.remove(is);
-                        iss.add(is);
-                    }
+            for (ItemStack is : rt.getOutput()) {
+                if (cInv.contains(is)) {
+                    cInv.remove(is);
+                    iss.add(is);
                 }
-                if (iss.isEmpty()) {
-                    return;
-                }
+            }
+            if (iss.isEmpty()) {
+                return;
             }
             
             StorageMinecart cart = loc.getWorld().spawn(loc, StorageMinecart.class);
