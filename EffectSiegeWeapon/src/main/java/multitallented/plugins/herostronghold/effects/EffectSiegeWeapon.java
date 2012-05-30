@@ -82,16 +82,20 @@ public class EffectSiegeWeapon extends Effect {
             String srName = sign.getLine(0);
             SuperRegion sr = plugin.getRegionManager().getSuperRegion(srName);
             if (sr == null) {
+                sign.setLine(2, "invalid name");
                 return;
             }
             //Check if too far away
-            int radius = plugin.getRegionManager().getSuperRegionType(sr.getType()).getRadius();
             int rawRadius = plugin.getRegionManager().getSuperRegionType(sr.getType()).getRawRadius();
             try {
-                if (sr.getLocation().distanceSquared(l) > radius + 10000) {
+                if (sr.getLocation().distance(l) - rawRadius >  100) {
+                    sign.setLine(2, "out of");
+                    sign.setLine(3, "range");
                     return;
                 }
             } catch (IllegalArgumentException iae) {
+                sign.setLine(2, "out of");
+                sign.setLine(3, "range");
                 return;
             }
             
