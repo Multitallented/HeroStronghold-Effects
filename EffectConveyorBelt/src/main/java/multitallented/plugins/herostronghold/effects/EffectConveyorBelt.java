@@ -92,8 +92,10 @@ public class EffectConveyorBelt extends Effect {
                           
                         }
                     }
-                    if (conveyor > 1) {
-                        currentChest.getInventory().addItem(new ItemStack(Material.STORAGE_MINECART, 1));
+                    try {
+                        ((Chest) r.getLocation().getBlock().getState()).getInventory().addItem(new ItemStack(Material.STORAGE_MINECART, 1));
+                    } catch (Exception e) {
+
                     }
                     removeMe.add(sm);
                     continue;
@@ -143,26 +145,27 @@ public class EffectConveyorBelt extends Effect {
             }
             Inventory cInv = chest.getInventory();
             
-            
             HashSet<ItemStack> iss = new HashSet<ItemStack>();
             if (rt.getOutput().isEmpty()) {
                 return;
             }
             
-            if (conveyor > 1) {
-                if (!cInv.contains(Material.STORAGE_MINECART)) {
-                    return;
-                } else {
-                    ItemStack tempCart = new ItemStack(Material.STORAGE_MINECART, 1);
-                    cInv.remove(tempCart);
-                }
+            if (!cInv.contains(Material.STORAGE_MINECART)) {
+                return;
+            } else {
+                ItemStack tempCart = new ItemStack(Material.STORAGE_MINECART, 1);
+                cInv.remove(tempCart);
             }
             
-            for (ItemStack is : rt.getOutput()) {
-                if (cInv.contains(is)) {
-                    cInv.remove(is);
-                    iss.add(is);
+            if (cInv.contains(conveyor)) {
+                for (ItemStack is : cInv.getContents()) {
+                    if (is.getTypeId() == conveyor) {
+                        iss.add(is);
+                    }
                 }
+            }
+            for (ItemStack is : iss) {
+                cInv.removeItem(is);
             }
             if (iss.isEmpty()) {
                 return;
