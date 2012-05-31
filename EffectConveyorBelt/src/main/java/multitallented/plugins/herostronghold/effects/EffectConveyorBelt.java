@@ -83,19 +83,20 @@ public class EffectConveyorBelt extends Effect {
                         continue;
                     }
                     HashSet<ItemStack> cartInventory = new HashSet<ItemStack>();
-                    cartInventory.addAll(Arrays.asList(sm.getInventory().getContents()));
-                    for (ItemStack is : cartInventory) {
-                        try {
-                            sm.getInventory().remove(is);
-                            currentChest.getInventory().addItem(is);
-                        } catch (NullPointerException npe) {
-                          
-                        }
-                    }
+                    
                     try {
                         ((Chest) r.getLocation().getBlock().getState()).getInventory().addItem(new ItemStack(Material.STORAGE_MINECART, 1));
                     } catch (Exception e) {
 
+                    }
+                    cartInventory.addAll(Arrays.asList(sm.getInventory().getContents()));
+                    for (ItemStack is : cartInventory) {
+                        try {
+                            sm.getInventory().removeItem(is);
+                            currentChest.getInventory().addItem(is);
+                        } catch (NullPointerException npe) {
+                          
+                        }
                     }
                     removeMe.add(sm);
                     continue;
@@ -137,6 +138,10 @@ public class EffectConveyorBelt extends Effect {
                 }
                 loc = cachePoints.get(r);
             }
+            if (rt.getOutput().isEmpty()) {
+                return;
+            }
+            
             Chest chest = null;
             try {
                 chest = (Chest) l.getBlock().getState();
@@ -144,24 +149,17 @@ public class EffectConveyorBelt extends Effect {
                 return;
             }
             Inventory cInv = chest.getInventory();
-            
             HashSet<ItemStack> iss = new HashSet<ItemStack>();
-            if (rt.getOutput().isEmpty()) {
-                return;
-            }
-            
-            if (!cInv.contains(Material.STORAGE_MINECART)) {
+            if (!cInv.contains(Material.STORAGE_MINECART) || !cInv.contains(conveyor)) {
                 return;
             } else {
                 ItemStack tempCart = new ItemStack(Material.STORAGE_MINECART, 1);
-                cInv.remove(tempCart);
+                cInv.removeItem(tempCart);
             }
             
-            if (cInv.contains(conveyor)) {
-                for (ItemStack is : cInv.getContents()) {
-                    if (is.getTypeId() == conveyor) {
-                        iss.add(is);
-                    }
+            for (ItemStack is : cInv.getContents()) {
+                if (is.getTypeId() == conveyor) {
+                    iss.add(is);
                 }
             }
             for (ItemStack is : iss) {
