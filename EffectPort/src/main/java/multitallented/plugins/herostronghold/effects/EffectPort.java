@@ -2,6 +2,7 @@ package main.java.multitallented.plugins.herostronghold.effects;
 
 import com.herocraftonline.heroes.characters.Hero;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -68,7 +69,7 @@ public class EffectPort extends Effect {
                 conf.set("port.money", 0);
                 conf.set("port.damage", 0);
                 conf.set("port.stamina", 0);
-                HashSet<String> tempSet = new HashSet<String>();
+                ArrayList<String> tempSet = new ArrayList<String>();
                 tempSet.add("BOAT.1");
                 conf.set("port.reagents", tempSet);
                 this.mana=0;
