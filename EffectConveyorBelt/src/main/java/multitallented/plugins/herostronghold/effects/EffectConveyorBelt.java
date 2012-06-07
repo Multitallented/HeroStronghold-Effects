@@ -1,6 +1,9 @@
 package main.java.multitallented.plugins.herostronghold.effects;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import multitallented.redcastlemedia.bukkit.herostronghold.HeroStronghold;
 import multitallented.redcastlemedia.bukkit.herostronghold.effect.Effect;
 import multitallented.redcastlemedia.bukkit.herostronghold.events.UpkeepEvent;
@@ -11,7 +14,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
-import org.bukkit.block.BlockState;
 import org.bukkit.block.Chest;
 import org.bukkit.entity.StorageMinecart;
 import org.bukkit.event.EventHandler;
@@ -84,16 +86,33 @@ public class EffectConveyorBelt extends Effect {
                     }
                     HashSet<ItemStack> cartInventory = new HashSet<ItemStack>();
                     
+                    Inventory originInv = null;
                     try {
-                        ((Chest) r.getLocation().getBlock().getState()).getInventory().addItem(new ItemStack(Material.STORAGE_MINECART, 1));
+                        originInv = ((Chest) r.getLocation().getBlock().getState()).getInventory();
+                        originInv.addItem(new ItemStack(Material.STORAGE_MINECART, 1));
                     } catch (Exception e) {
 
                     }
+                    boolean isFull = false;
                     cartInventory.addAll(Arrays.asList(sm.getInventory().getContents()));
                     for (ItemStack is : cartInventory) {
                         try {
-                            sm.getInventory().removeItem(is);
-                            currentChest.getInventory().addItem(is);
+                            if (!isFull) {
+                              if (currentChest.getBlockInventory().firstEmpty() < 0) {
+                                  isFull = true;
+                                  if (originInv == null || originInv.firstEmpty() < 0) {
+                                      break;
+                                  } else {
+                                      originInv.addItem(is);
+                                      sm.getInventory().removeItem(is);
+                                  }
+                              }
+                              sm.getInventory().removeItem(is);
+                              currentChest.getInventory().addItem(is);
+                            } else {
+                                sm.getInventory().removeItem(is);
+                                originInv.addItem(is);
+                            }
                         } catch (NullPointerException npe) {
                           
                         }
