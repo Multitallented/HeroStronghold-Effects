@@ -88,7 +88,7 @@ public class EffectSiegeWeapon extends Effect {
             //Check if too far away
             int rawRadius = plugin.getRegionManager().getSuperRegionType(sr.getType()).getRawRadius();
             try {
-                if (sr.getLocation().distance(l) - rawRadius >  100) {
+                if (sr.getLocation().distance(l) - rawRadius >  150) {
                     sign.setLine(2, "out of");
                     sign.setLine(3, "range");
                     return;

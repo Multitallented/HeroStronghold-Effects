@@ -86,21 +86,33 @@ public class EffectConveyorBelt extends Effect {
                     }
                     HashSet<ItemStack> cartInventory = new HashSet<ItemStack>();
                     
+                    Inventory originInv = null;
                     try {
-                        ((Chest) carts.get(sm).getLocation().getBlock().getState()).getInventory().addItem(new ItemStack(Material.STORAGE_MINECART, 1));
+                        originInv = ((Chest) r.getLocation().getBlock().getState()).getInventory();
+                        originInv.addItem(new ItemStack(Material.STORAGE_MINECART, 1));
                     } catch (Exception e) {
 
                     }
-                    //ignore the cart if the destination is full
-                    if (currentChest.getInventory().getSize() >= currentChest.getInventory().getMaxStackSize()) {
-                        removeMe.add(sm);
-                        continue;
-                    }
+                    boolean isFull = false;
                     cartInventory.addAll(Arrays.asList(sm.getInventory().getContents()));
                     for (ItemStack is : cartInventory) {
                         try {
-                            sm.getInventory().removeItem(is);
-                            currentChest.getInventory().addItem(is);
+                            if (!isFull) {
+                              if (currentChest.getBlockInventory().firstEmpty() < 0) {
+                                  isFull = true;
+                                  if (originInv == null || originInv.firstEmpty() < 0) {
+                                      break;
+                                  } else {
+                                      originInv.addItem(is);
+                                      sm.getInventory().removeItem(is);
+                                  }
+                              }
+                              sm.getInventory().removeItem(is);
+                              currentChest.getInventory().addItem(is);
+                            } else {
+                                sm.getInventory().removeItem(is);
+                                originInv.addItem(is);
+                            }
                         } catch (NullPointerException npe) {
                           
                         }
@@ -118,19 +130,6 @@ public class EffectConveyorBelt extends Effect {
             
             //Check if has reagents
             if (!effect.hasReagents(l)) {
-                return;
-            }
-            
-            Chest chest = null;
-            try {
-                chest = (Chest) l.getBlock().getState();
-            } catch (Exception e) {
-                return;
-            }
-            Inventory cInv = chest.getInventory();
-            HashSet<ItemStack> iss = new HashSet<ItemStack>();
-            
-            if (!cInv.contains(Material.STORAGE_MINECART) || !cInv.contains(conveyor)) {
                 return;
             }
             
@@ -158,15 +157,27 @@ public class EffectConveyorBelt extends Effect {
                 }
                 loc = cachePoints.get(r);
             }
+            if (rt.getOutput().isEmpty()) {
+                return;
+            }
             
-            
-            ItemStack tempCart = new ItemStack(Material.STORAGE_MINECART, 1);
-            cInv.removeItem(tempCart);
+            Chest chest = null;
+            try {
+                chest = (Chest) l.getBlock().getState();
+            } catch (Exception e) {
+                return;
+            }
+            Inventory cInv = chest.getInventory();
+            HashSet<ItemStack> iss = new HashSet<ItemStack>();
+            if (!cInv.contains(Material.STORAGE_MINECART) || !cInv.contains(conveyor)) {
+                return;
+            } else {
+                ItemStack tempCart = new ItemStack(Material.STORAGE_MINECART, 1);
+                cInv.removeItem(tempCart);
+            }
             
             for (ItemStack is : cInv.getContents()) {
-                if (is != null) {
-                }
-                if (is != null && is.getTypeId() == conveyor) {
+                if (is.getTypeId() == conveyor) {
                     iss.add(is);
                 }
             }

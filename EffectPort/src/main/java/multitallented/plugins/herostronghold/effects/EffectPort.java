@@ -2,7 +2,10 @@ package main.java.multitallented.plugins.herostronghold.effects;
 
 import com.herocraftonline.heroes.characters.Hero;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import multitallented.redcastlemedia.bukkit.herostronghold.HeroStronghold;
 import multitallented.redcastlemedia.bukkit.herostronghold.effect.Effect;
 import multitallented.redcastlemedia.bukkit.herostronghold.events.CommandEffectEvent;
@@ -11,6 +14,7 @@ import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.BlockFace;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -20,6 +24,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDamageEvent.DamageCause;
+import org.bukkit.inventory.ItemStack;
 
 /**
  *
@@ -33,6 +38,7 @@ public class EffectPort extends Effect {
     private int damage;
     private HashMap<Player, Long> cooldowns = new HashMap<Player, Long>();
     private int stamina;
+    private HashSet<ItemStack> reagents = new HashSet<ItemStack>();
     
     public EffectPort(HeroStronghold plugin) {
         super(plugin);
@@ -63,6 +69,9 @@ public class EffectPort extends Effect {
                 conf.set("port.money", 0);
                 conf.set("port.damage", 0);
                 conf.set("port.stamina", 0);
+                ArrayList<String> tempSet = new ArrayList<String>();
+                tempSet.add("BOAT.1");
+                conf.set("port.reagents", tempSet);
                 this.mana=0;
                 this.warmup=0;
                 this.cooldown=0;
@@ -76,12 +85,36 @@ public class EffectPort extends Effect {
                 this.money=cs.getInt("money",0);
                 this.damage=cs.getInt("damage",0);
                 this.stamina=cs.getInt("stamina",0);
+                this.reagents=processStringList(cs.getStringList("reagents"));
             }
             conf.save(config);
         } catch (Exception e) {
             plugin.warning("Could not load settings for EffectPort.jar");
         }
+        
+        
     }
+    
+    private HashSet<ItemStack> processStringList(List<String> list) {
+        HashSet<ItemStack> tempSet = new HashSet<ItemStack>();
+        if (list == null) {
+            return tempSet;
+        }
+        for (String s : list) {
+            String[] parts = s.split("\\.");
+            ItemStack is;
+            try {
+                is = new ItemStack(Material.getMaterial(parts[0]), Integer.parseInt(parts[1]));
+                tempSet.add(is);
+            } catch (Exception e) {
+                System.out.println("[HeroStronghold] Invalid port config " + s);
+            }
+            
+        }
+        
+        return tempSet;
+    }
+    
     
     public class TeleportListener implements Listener {
         private final EffectPort effect;
@@ -134,6 +167,14 @@ public class EffectPort extends Effect {
             if (stamina > 0 && player.getFoodLevel() < stamina) {
                 player.sendMessage(ChatColor.GRAY + "[HeroStronghold] You need " + (stamina - player.getFoodLevel()) + " stamina to port");
                 return;
+            }
+            
+            //Check if player has reagents
+            for (ItemStack is : reagents) {
+                if (!player.getInventory().contains(is.getType(), is.getAmount())) {
+                    player.sendMessage(ChatColor.GRAY + "[HeroStronghold] You need " + is.getAmount() + " " + is.getType().name().replace("_", " "));
+                    return;
+                }
             }
             
             int j=-1;
@@ -196,6 +237,9 @@ public class EffectPort extends Effect {
                     }
                     if (stamina > 0) {
                         p.setFoodLevel(p.getFoodLevel() - stamina);
+                    }
+                    for (ItemStack is : reagents) {
+                        p.getInventory().removeItem(is);
                     }
                     p.sendMessage(ChatColor.GOLD + "[HeroStronghold] You have been teleported!");
                 }

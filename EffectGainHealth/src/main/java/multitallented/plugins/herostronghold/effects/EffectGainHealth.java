@@ -3,7 +3,6 @@ package main.java.multitallented.plugins.herostronghold.effects;
 import com.herocraftonline.heroes.Heroes;
 import com.herocraftonline.heroes.characters.Hero;
 import multitallented.redcastlemedia.bukkit.herostronghold.HeroStronghold;
-import multitallented.redcastlemedia.bukkit.herostronghold.effect.Effect;
 import multitallented.redcastlemedia.bukkit.herostronghold.events.PlayerInRegionEvent;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.Region;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionManager;
