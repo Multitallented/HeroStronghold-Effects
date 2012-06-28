@@ -38,7 +38,7 @@ public class EffectGainStamina extends Effect {
             if (player.getFoodLevel() == 20)
                 return;
             
-            Location l = event.getRegionLocation();
+            Location l = event.getLocation();
             ArrayList<String> effects = effect.rm.getRegionType(effect.rm.getRegion(l).getType()).getEffects();
             //Check if the region has the shoot arrow effect and return arrow velocity
             int food = effect.regionHasEffect(effects, "gainstamina");
@@ -56,7 +56,7 @@ public class EffectGainStamina extends Effect {
                 return;
             
             //Run upkeep but don't need to know if upkeep occured
-            effect.forceUpkeep(l);
+            effect.forceUpkeep(event);
             
             //grant the player food
             if (player.getFoodLevel() + food <= 20) {

@@ -39,10 +39,10 @@ public class EffectTeleport extends Effect {
         
         @EventHandler
         public void onCustomEvent(PlayerInRegionEvent event) {
-            if (!event.getRegionLocation().getBlock().getRelative(BlockFace.UP).equals(event.getPlayer().getLocation().getBlock())) {
+            if (!event.getLocation().getBlock().getRelative(BlockFace.UP).equals(event.getPlayer().getLocation().getBlock())) {
                 return;
             }
-            Location l = event.getRegionLocation();
+            Location l = event.getLocation();
             RegionManager rm = getPlugin().getRegionManager();
             Region r = rm.getRegion(l);
             RegionType rt = rm.getRegionType(r.getType());
@@ -94,11 +94,12 @@ public class EffectTeleport extends Effect {
             
             
             //Check to see if the HeroStronghold has enough reagents
-            if (!effect.hasReagents(l))
+            if (!effect.hasReagents(l)) {
                 return;
+            }
             
             //Run upkeep but don't need to know if upkeep occured
-            effect.forceUpkeep(l);
+            effect.forceUpkeep(event);
             event.getPlayer().teleport(targetLoc.getBlock().getRelative(BlockFace.NORTH, 2).getRelative(BlockFace.UP).getLocation());
             event.getPlayer().sendMessage(ChatColor.GOLD + "[HeroStronghold] You have been teleported!");
         }

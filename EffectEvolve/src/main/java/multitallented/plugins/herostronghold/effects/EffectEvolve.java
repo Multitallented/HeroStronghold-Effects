@@ -11,12 +11,16 @@ import multitallented.redcastlemedia.bukkit.herostronghold.events.UpkeepSuccessE
 import multitallented.redcastlemedia.bukkit.herostronghold.region.Region;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionManager;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionType;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.block.Chest;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.server.PluginDisableEvent;
+import org.bukkit.inventory.ItemStack;
 
 /**
  *
@@ -120,9 +124,6 @@ public class EffectEvolve extends Effect {
                 } catch (Exception e) {
                     return;
                 }
-                if (successes < 0) {
-                    return;
-                }
                 upkeeps.put(r, successes + 1);
             }
             
@@ -138,6 +139,34 @@ public class EffectEvolve extends Effect {
                 ArrayList<String> members = r.getMembers();
                 cRegions.add(new Region(r.getID(), l, evolutions.get(r.getType()), owners, members));
                 event.getEvent().setRegionsToCreate(cRegions);
+                try {
+                    Chest chest = (Chest) l.getBlock().getState();
+                    final ItemStack[] inv = new ItemStack[chest.getInventory().getContents().length];
+                    for (int i=0; i< inv.length; i++) {
+                        ItemStack is = chest.getInventory().getContents()[i];
+                        inv[i] = is;
+                    }
+                    chest.getInventory().clear();
+                    final Location loc = l;
+                    Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, 
+                            new Runnable() {
+                                
+                                @Override
+                                public void run() {
+                                    try {
+                                        loc.getBlock().setType(Material.CHEST);
+                                        Chest chest1 = (Chest) loc.getBlock().getState();
+                                        for (ItemStack is : inv) {
+                                            chest1.getInventory().addItem(is);
+                                        }
+                                    } catch (Exception e) {
+                                        
+                                    }
+                                }
+                            }, 1L);
+                } catch (Exception e) {
+                    
+                }
                 upkeeps.remove(r);
                 lastSave.remove(r);
             } else {
@@ -188,7 +217,6 @@ public class EffectEvolve extends Effect {
                     try {
                         rConfig.load(regionFile);
                         rConfig.set("successful-upkeeps", upkeeps.get(r));
-                        lastSave.remove(r);
                         rConfig.save(regionFile);
                     } catch (Exception e) {
                         continue;

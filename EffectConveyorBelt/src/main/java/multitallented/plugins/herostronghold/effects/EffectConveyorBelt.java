@@ -41,6 +41,7 @@ public class EffectConveyorBelt extends Effect {
         private final RegionManager rm;
         private HashMap<StorageMinecart, Region> carts = new HashMap<StorageMinecart, Region>();
         private HashMap<Region, Location> cachePoints = new HashMap<Region, Location>();
+        private HashMap<Region, Region> cacheRegions = new HashMap<Region, Region>();
         public UpkeepListener(EffectConveyorBelt effect, RegionManager rm) {
             this.effect = effect;
             this.rm = rm;
@@ -51,7 +52,7 @@ public class EffectConveyorBelt extends Effect {
         public void onCustomEvent(UpkeepEvent event) {
             
             
-            Location l = event.getRegionLocation();
+            Location l = event.getLocation();
             
             //Check if has effect conveyor
             Region r = rm.getRegion(l);
@@ -76,11 +77,13 @@ public class EffectConveyorBelt extends Effect {
                 ArrayList<Region> regions = rm.getContainingBuildRegions(sm.getLocation());
                 if (!regions.isEmpty()) {
                     Chest currentChest = null;
+                    Region re;
                     try {
                         if (regions.get(0).equals(carts.get(sm))) {
                             continue;
                         }
-                        currentChest = (Chest) regions.get(0).getLocation().getBlock().getState();
+                        re = regions.get(0);
+                        currentChest = (Chest) re.getLocation().getBlock().getState();
                     } catch (Exception e) {
                         continue;
                     }
@@ -88,7 +91,7 @@ public class EffectConveyorBelt extends Effect {
                     
                     Inventory originInv = null;
                     try {
-                        originInv = ((Chest) r.getLocation().getBlock().getState()).getInventory();
+                        originInv = ((Chest) carts.get(sm).getLocation().getBlock().getState()).getInventory();
                         originInv.addItem(new ItemStack(Material.STORAGE_MINECART, 1));
                     } catch (Exception e) {
 
@@ -98,17 +101,17 @@ public class EffectConveyorBelt extends Effect {
                     for (ItemStack is : cartInventory) {
                         try {
                             if (!isFull) {
-                              if (currentChest.getBlockInventory().firstEmpty() < 0) {
-                                  isFull = true;
-                                  if (originInv == null || originInv.firstEmpty() < 0) {
-                                      break;
-                                  } else {
-                                      originInv.addItem(is);
-                                      sm.getInventory().removeItem(is);
-                                  }
-                              }
-                              sm.getInventory().removeItem(is);
-                              currentChest.getInventory().addItem(is);
+                                if (currentChest.getBlockInventory().firstEmpty() < 0) {
+                                    isFull = true;
+                                    if (originInv == null || originInv.firstEmpty() < 0) {
+                                        break;
+                                    } else {
+                                        originInv.addItem(is);
+                                        sm.getInventory().removeItem(is);
+                                    }
+                                }
+                                sm.getInventory().removeItem(is);
+                                currentChest.getInventory().addItem(is);
                             } else {
                                 sm.getInventory().removeItem(is);
                                 originInv.addItem(is);
@@ -118,7 +121,9 @@ public class EffectConveyorBelt extends Effect {
                         }
                     }
                     removeMe.add(sm);
-                    continue;
+                    if (!cacheRegions.containsKey(carts.get(sm))) {
+                        cacheRegions.put(carts.get(sm), re);
+                    }
                 }
             }
             for (StorageMinecart sm : removeMe) {
@@ -157,9 +162,6 @@ public class EffectConveyorBelt extends Effect {
                 }
                 loc = cachePoints.get(r);
             }
-            if (rt.getOutput().isEmpty()) {
-                return;
-            }
             
             Chest chest = null;
             try {
@@ -171,22 +173,42 @@ public class EffectConveyorBelt extends Effect {
             HashSet<ItemStack> iss = new HashSet<ItemStack>();
             if (!cInv.contains(Material.STORAGE_MINECART) || !cInv.contains(conveyor)) {
                 return;
-            } else {
-                ItemStack tempCart = new ItemStack(Material.STORAGE_MINECART, 1);
-                cInv.removeItem(tempCart);
             }
-            
             for (ItemStack is : cInv.getContents()) {
-                if (is.getTypeId() == conveyor) {
+                if (is != null && is.getTypeId() == conveyor) {
                     iss.add(is);
                 }
-            }
-            for (ItemStack is : iss) {
-                cInv.removeItem(is);
             }
             if (iss.isEmpty()) {
                 return;
             }
+            
+            //If chunk not loaded try using region cache to move directly
+            if (!loc.getChunk().isLoaded()) {
+                if (cacheRegions.containsKey(r)) {
+                    Chest tempChest = (Chest) cacheRegions.get(r).getLocation().getBlock().getState();
+                    if (tempChest.getInventory().firstEmpty() < 0) {
+                        return;
+                    }
+                    for (ItemStack is : iss) {
+                        cInv.removeItem(is);
+                    }
+                    try {
+                        for (ItemStack is : iss) {
+                            tempChest.getInventory().addItem(is);
+                        }
+                    } catch (Exception e) {
+                        
+                    }
+                }
+                return;
+            }
+            for (ItemStack is : iss) {
+                cInv.removeItem(is);
+            }
+            
+            ItemStack tempCart = new ItemStack(Material.STORAGE_MINECART, 1);
+            cInv.removeItem(tempCart);
             
             StorageMinecart cart = loc.getWorld().spawn(loc, StorageMinecart.class);
             

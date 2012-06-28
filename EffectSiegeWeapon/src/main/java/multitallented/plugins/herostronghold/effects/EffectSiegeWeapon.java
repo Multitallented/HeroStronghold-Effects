@@ -44,8 +44,8 @@ public class EffectSiegeWeapon extends Effect {
         
         @EventHandler
         public void onCustomEvent(UpkeepEvent event) {
-            Location l = event.getRegionLocation();
-            Region r = getPlugin().getRegionManager().getRegion(event.getRegionLocation());
+            Location l = event.getLocation();
+            Region r = getPlugin().getRegionManager().getRegion(event.getLocation());
             if (r == null)
                 return;
             RegionType rt = getPlugin().getRegionManager().getRegionType(r.getType()); 
@@ -100,7 +100,8 @@ public class EffectSiegeWeapon extends Effect {
             }
             
             //Run upkeep but don't need to know if upkeep occured
-            effect.forceUpkeep(l);
+            //effect.forceUpkeep(l);
+            effect.forceUpkeep(event);
             lastUpkeep.put(l, new Date().getTime());
             
             Location spawnLoc = l.getBlock().getRelative(BlockFace.UP, 3).getLocation();

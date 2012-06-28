@@ -32,32 +32,12 @@ public class EffectGate extends Effect {
         this.rm = plugin.getRegionManager();
         registerEvent(new IntruderListener(this));
         registerEvent(new CloseGateListener());
-        //registerEvent(Type.CUSTOM_EVENT, new GateDestroyedListener(), Priority.Normal);
     }
     
     @Override
     public void init(HeroStronghold plugin) {
         super.init(plugin);
     }
-    
-    /*public class GateDestroyedListener extends CustomEventListener {
-        @Override
-        public void onCustomEvent(Event event) {
-            if (!(event instanceof RegionDestroyedEvent)) {
-                return;
-            }
-            RegionDestroyedEvent rde = (RegionDestroyedEvent) event;
-            Location l  = rde.getLocation();
-            if (!openGates.contains(l)) {
-                return;
-            }
-            
-            for (Block b : gates.get(l)) {
-                b.setTypeId(85);
-            }
-            
-        }
-    }*/
     
     public class CloseGateListener implements Listener {
         @EventHandler
@@ -121,8 +101,9 @@ public class EffectGate extends Effect {
             
             //Check if the region has the shoot arrow effect and return arrow velocity
             double speed = effect.regionHasEffect(effect.rm.getRegionType(effect.rm.getRegion(loc).getType()).getEffects(), "gate");
-            if (speed == 0)
+            if (speed == 0) {
                 return;
+            }
             
             Player player = event.getPlayer();
             
@@ -132,8 +113,9 @@ public class EffectGate extends Effect {
             }
             
             //Check to see if the HeroStronghold has enough reagents
-            if (!effect.hasReagents(loc))
+            if (!effect.hasReagents(loc)) {
                 return;
+            }
             
             //Run upkeep but don't need to know if upkeep occured
             effect.forceUpkeep(loc);

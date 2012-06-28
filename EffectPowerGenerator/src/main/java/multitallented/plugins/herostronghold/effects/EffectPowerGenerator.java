@@ -40,8 +40,8 @@ public class EffectPowerGenerator extends Effect {
         
         @EventHandler
         public void onCustomEvent(UpkeepEvent event) {
-            Location l = event.getRegionLocation();
-            Region r = getPlugin().getRegionManager().getRegion(event.getRegionLocation());
+            Location l = event.getLocation();
+            Region r = getPlugin().getRegionManager().getRegion(event.getLocation());
             if (r == null) {
                 return;
             }
@@ -69,7 +69,7 @@ public class EffectPowerGenerator extends Effect {
             for (SuperRegion sr : plugin.getRegionManager().getContainingSuperRegions(l)) {
                 if (sr.getPower() < plugin.getRegionManager().getSuperRegionType(sr.getType()).getMaxPower()) {
                     sr.setPower(sr.getPower() + 1);
-                    effect.forceUpkeep(l);
+                    effect.forceUpkeep(event);
                 }
             }
         }

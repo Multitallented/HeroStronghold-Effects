@@ -38,8 +38,8 @@ public class EffectPeriodicFarm extends Effect {
         
         @EventHandler
         public void onCustomEvent(PlayerInRegionEvent event) {
-            Location l = event.getRegionLocation();
-            Region r = getPlugin().getRegionManager().getRegion(event.getRegionLocation());
+            Location l = event.getLocation();
+            Region r = getPlugin().getRegionManager().getRegion(event.getLocation());
             if (r == null) {
                 return;
             }
@@ -132,10 +132,11 @@ public class EffectPeriodicFarm extends Effect {
                 return;
             }
             //Check for upkeep
-            if (!effect.upkeep(l)) {
+            if (!effect.upkeep(event)) {
                 return;
             }
-            l.getWorld().spawnCreature(l.getBlock().getRelative(BlockFace.UP).getLocation(), ct);
+            l.getWorld().spawn(l.getBlock().getRelative(BlockFace.UP).getLocation(), ct.getEntityClass());
+            //l.getWorld().spawnCreature(l.getBlock().getRelative(BlockFace.UP).getLocation(), ct);
         }
     }
     

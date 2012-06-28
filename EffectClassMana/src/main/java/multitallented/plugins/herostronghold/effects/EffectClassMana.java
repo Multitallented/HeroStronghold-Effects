@@ -47,7 +47,7 @@ public class EffectClassMana extends Effect {
             hero = heroes.getCharacterManager().getHero(player);
             
             
-            Location l = event.getRegionLocation();
+            Location l = event.getLocation();
             RegionManager rm = effect.getPlugin().getRegionManager();
             Region r = rm.getRegion(l);
             RegionType rt = rm.getRegionType(r.getType());
@@ -79,7 +79,7 @@ public class EffectClassMana extends Effect {
             }
             
             //Run upkeep but don't need to know if upkeep occured
-            effect.forceUpkeep(l);
+            effect.forceUpkeep(event);
             
             //grant the player food
             if (friendly) {

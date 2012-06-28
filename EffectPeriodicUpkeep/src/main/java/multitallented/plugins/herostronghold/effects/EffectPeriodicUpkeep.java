@@ -6,7 +6,6 @@ import multitallented.redcastlemedia.bukkit.herostronghold.events.UpkeepEvent;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.Region;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionType;
 import org.bukkit.Location;
-import org.bukkit.event.Event;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -34,21 +33,25 @@ public class EffectPeriodicUpkeep extends Effect {
         
         @EventHandler
         public void onCustomEvent(UpkeepEvent event) {
-            Location l = event.getRegionLocation();
-            Region r = getPlugin().getRegionManager().getRegion(event.getRegionLocation());
-            if (r == null)
+            Location l = event.getLocation();
+            Region r = getPlugin().getRegionManager().getRegion(event.getLocation());
+            if (r == null) {
                 return;
+            }
             RegionType rt = getPlugin().getRegionManager().getRegionType(r.getType()); 
             
             //Check if the region has the shoot arrow effect and return arrow velocity
-            if (effect.regionHasEffect(rt.getEffects(), "periodicupkeep") == 0)
+            if (effect.regionHasEffect(rt.getEffects(), "periodicupkeep") == 0) {
                 return;
+            }
             
             //Check to see if the HeroStronghold has enough reagents
-            if (!effect.hasReagents(l))
+            if (!effect.hasReagents(l)) {
                 return;
+            }
             //Run upkeep but don't need to know if upkeep occured
-            effect.forceUpkeep(l);
+            effect.forceUpkeep(event);
+            //effect.forceUpkeep(l);
         }
     }
     

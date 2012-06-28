@@ -36,7 +36,7 @@ public class EffectManCannon extends Effect {
         
         @EventHandler
         public void onCustomEvent(PlayerInRegionEvent event) {
-            Location l = event.getRegionLocation();
+            Location l = event.getLocation();
             RegionManager rm = getPlugin().getRegionManager();
             Region r = rm.getRegion(l);
             if (r == null)
@@ -50,11 +50,12 @@ public class EffectManCannon extends Effect {
                 return;
             
             //Check to see if the HeroStronghold has enough reagents
-            if (!effect.hasReagents(l))
+            if (!effect.hasReagents(l)) {
                 return;
+            }
             
             //Run upkeep but don't need to know if upkeep occured
-            effect.forceUpkeep(l);
+            effect.forceUpkeep(event);
             
             
             //Launch the player into the air

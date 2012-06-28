@@ -41,7 +41,7 @@ public class EffectLandMine extends Effect {
         public void onCustomEvent(PlayerInRegionEvent event) {
             Player player = event.getPlayer();
             
-            Location l = event.getRegionLocation();
+            Location l = event.getLocation();
             ArrayList<String> effects = effect.rm.getRegionType(effect.rm.getRegion(l).getType()).getEffects();
 
             //Check if the region has the shoot arrow effect and return arrow velocity
@@ -60,7 +60,7 @@ public class EffectLandMine extends Effect {
                 return;
             
             //Run upkeep but don't need to know if upkeep occured
-            effect.forceUpkeep(l);
+            effect.forceUpkeep(event);
             
             RegionManager rm = effect.getPlugin().getRegionManager();
             //Check to see if exploding regions are enabled
@@ -71,7 +71,6 @@ public class EffectLandMine extends Effect {
                 l.getBlock().setTypeId(0);
                 TNTPrimed tnt = l.getWorld().spawn(l, TNTPrimed.class);
                 tnt.setFuseTicks(1);
-                //l.getBlock().getRelative(BlockFace.DOWN).setType(Material.REDSTONE_TORCH_ON);
             }
             
             //Set the event to destroy the region

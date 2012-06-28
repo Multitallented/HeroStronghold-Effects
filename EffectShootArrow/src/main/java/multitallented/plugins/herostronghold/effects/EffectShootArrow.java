@@ -38,7 +38,7 @@ public class EffectShootArrow extends Effect {
         @EventHandler
         public void onCustomEvent(PlayerInRegionEvent event) {
             
-            Location l = event.getRegionLocation();
+            Location l = event.getLocation();
             //Check if the region has the shoot arrow effect and return arrow velocity
             double speed = effect.regionHasEffect(effect.rm.getRegionType(effect.rm.getRegion(l).getType()).getEffects(), "shootarrow");
             if (speed == 0)
@@ -52,11 +52,12 @@ public class EffectShootArrow extends Effect {
             }
             
             //Check to see if the HeroStronghold has enough reagents
-            if (!effect.hasReagents(l))
+            if (!effect.hasReagents(l)) {
                 return;
+            }
             
             //Run upkeep but don't need to know if upkeep occured
-            effect.forceUpkeep(l);
+            effect.forceUpkeep(event);
             
             //Calculate trajectory of the arrow
             Location loc = l.getBlock().getRelative(BlockFace.UP, 2).getLocation();

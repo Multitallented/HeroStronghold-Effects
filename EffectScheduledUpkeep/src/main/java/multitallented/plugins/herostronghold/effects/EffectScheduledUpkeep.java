@@ -37,10 +37,11 @@ public class EffectScheduledUpkeep extends Effect {
         
         @EventHandler
         public void onCustomEvent(UpkeepEvent event) {
-            Location l = event.getRegionLocation();
-            Region r = getPlugin().getRegionManager().getRegion(event.getRegionLocation());
-            if (r == null)
+            Location l = event.getLocation();
+            Region r = getPlugin().getRegionManager().getRegion(event.getLocation());
+            if (r == null) {
                 return;
+            }
             RegionType rt = getPlugin().getRegionManager().getRegionType(r.getType()); 
             
             //Check if the region has the shoot arrow effect and return arrow velocity
@@ -57,7 +58,8 @@ public class EffectScheduledUpkeep extends Effect {
                     return;
                 }
                 //Run upkeep but don't need to know if upkeep occured
-                effect.forceUpkeep(l);
+                effect.forceUpkeep(event);
+                //effect.forceUpkeep(l);
                 lastUpkeep.put(l, new Date().getTime());
                 return;
             } else if (period + lastUpkeep.get(l) > new Date().getTime()) {
@@ -65,10 +67,12 @@ public class EffectScheduledUpkeep extends Effect {
             }
             
             //Check to see if the HeroStronghold has enough reagents
-            if (!effect.hasReagents(l))
+            if (!effect.hasReagents(l)) {
                 return;
+            }
             //Run upkeep but don't need to know if upkeep occured
-            effect.forceUpkeep(l);
+            effect.forceUpkeep(event);
+            //effect.forceUpkeep(l);
             lastUpkeep.put(l, new Date().getTime());
         }
     }

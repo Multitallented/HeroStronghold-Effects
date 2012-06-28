@@ -3,6 +3,7 @@ package main.java.multitallented.plugins.herostronghold.effects;
 import com.herocraftonline.heroes.Heroes;
 import com.herocraftonline.heroes.characters.Hero;
 import multitallented.redcastlemedia.bukkit.herostronghold.HeroStronghold;
+import multitallented.redcastlemedia.bukkit.herostronghold.effect.Effect;
 import multitallented.redcastlemedia.bukkit.herostronghold.events.PlayerInRegionEvent;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.Region;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionManager;
@@ -44,15 +45,14 @@ public class EffectGainHealth extends Effect {
             Heroes heroes = HeroStronghold.heroes;
             if (heroes != null)
                 hero = heroes.getCharacterManager().getHero(player);
-            if (hero == null) {
-                if (player.getHealth() == 20)
-                    return;
-            } else if (hero.getHealth() == hero.getMaxHealth()) {
+            if (hero == null && player.getHealth() == 20) {
+                return;
+            } else if (hero != null && hero.getHealth() == hero.getMaxHealth()) {
                 return;
             }
             
             
-            Location l = event.getRegionLocation();
+            Location l = event.getLocation();
             RegionManager rm = effect.getPlugin().getRegionManager();
             Region r = rm.getRegion(l);
             RegionType rt = rm.getRegionType(r.getType());
@@ -68,11 +68,12 @@ public class EffectGainHealth extends Effect {
             }
             
             //Check to see if the HeroStronghold has enough reagents
-            if (!effect.hasReagents(l))
+            if (!effect.hasReagents(l)) {
                 return;
+            }
             
             //Run upkeep but don't need to know if upkeep occured
-            effect.forceUpkeep(l);
+            effect.forceUpkeep(event);
             
             //grant the player hp
             EntityRegainHealthEvent e = new EntityRegainHealthEvent(player, addHealth, RegainReason.CUSTOM);

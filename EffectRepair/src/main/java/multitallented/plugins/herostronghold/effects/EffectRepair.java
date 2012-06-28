@@ -1,5 +1,9 @@
 package main.java.multitallented.plugins.herostronghold.effects;
 
+/**
+ *
+ * @author Sevaron
+ */
 import multitallented.redcastlemedia.bukkit.herostronghold.HeroStronghold;
 import multitallented.redcastlemedia.bukkit.herostronghold.effect.Effect;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.Region;
@@ -36,117 +40,59 @@ public class EffectRepair extends Effect
 
     private Material getRequiredReagent(Material material) {
       switch (material) {
-      case LEATHER_CHESTPLATE:
-      case LEATHER_HELMET:
-      case LEATHER_LEGGINGS:
-      case LEAVES:
-      case NETHERRACK:
+          case WOOD_HOE:
+          case WOOD_PICKAXE:
+          case WOOD_PLATE:
+          case WOOD_SPADE:
+          case WOOD_STAIRS:
+          case WOOD_SWORD:
         return Material.WOOD;
-      case LEVER:
-      case LOCKED_CHEST:
-      case LOG:
-      case LONG_GRASS:
-      case NETHER_BRICK:
-        return Material.COBBLESTONE;
-      case IRON_PICKAXE:
-      case IRON_SPADE:
-      case IRON_SWORD:
-      case JACK_O_LANTERN:
-      case LEATHER_BOOTS:
-      case NETHER_BRICK_STAIRS:
-      case POTION:
-      case POWERED_MINECART:
-      case POWERED_RAIL:
-      case PUMPKIN:
-      case STONE_HOE:
-        return Material.IRON_INGOT;
-      case MINECART:
-      case MOB_SPAWNER:
-      case MONSTER_EGG:
-      case MONSTER_EGGS:
-      case NETHER_STALK:
-      case RAW_CHICKEN:
-      case RAW_FISH:
-      case RECORD_10:
-      case RECORD_11:
-        return Material.GOLD_INGOT;
-      case MAGMA_CREAM:
-      case MAP:
-      case MELON:
-      case MELON_BLOCK:
-      case NETHER_FENCE:
-      case PUMPKIN_SEEDS:
-      case PUMPKIN_STEM:
-      case RAILS:
-      case RAW_BEEF:
-        return Material.DIAMOND;
-      case PAINTING:
-      case PAPER:
-      case PISTON_BASE:
-      case PISTON_EXTENSION:
+          case LEATHER_CHESTPLATE:
+          case LEATHER_HELMET:
+          case LEATHER_LEGGINGS:
+          case LEATHER_BOOTS:
         return Material.LEATHER;
-      case LADDER:
-      case SNOW_BLOCK:
+          case STONE_AXE:
+          case STONE_HOE:
+          case STONE_PICKAXE:
+          case STONE_SPADE:
+          case STONE_SWORD:
+        return Material.COBBLESTONE;
+          case IRON_PICKAXE:
+          case IRON_SPADE:
+          case IRON_SWORD:
+          case IRON_AXE:
+          case IRON_HOE:
+          case IRON_CHESTPLATE:
+          case IRON_HELMET:
+          case IRON_LEGGINGS:
+          case IRON_BOOTS:
+          case SHEARS:
+        return Material.IRON_INGOT;
+          case GOLD_PICKAXE:
+          case GOLD_SPADE:
+          case GOLD_SWORD:
+          case GOLD_AXE:
+          case GOLD_HOE:
+          case GOLD_CHESTPLATE:
+          case GOLD_HELMET:
+          case GOLD_LEGGINGS:
+          case GOLD_BOOTS:
+        return Material.GOLD_INGOT;
+          case DIAMOND_PICKAXE:
+          case DIAMOND_SPADE:
+          case DIAMOND_SWORD:
+          case DIAMOND_AXE:
+          case DIAMOND_HOE:
+          case DIAMOND_CHESTPLATE:
+          case DIAMOND_HELMET:
+          case DIAMOND_LEGGINGS:
+          case DIAMOND_BOOTS:
+        return Material.DIAMOND;
+          case BOW:
+          case FISHING_ROD:
         return Material.STRING;
-      case JUKEBOX:
-      case LAPIS_BLOCK:
-      case LAPIS_ORE:
-      case LAVA:
-      case LAVA_BUCKET:
-      case LEATHER:
-      case MELON_SEEDS:
-      case MELON_STEM:
-      case MILK_BUCKET:
-      case MOSSY_COBBLESTONE:
-      case MUSHROOM_SOUP:
-      case MYCEL:
-      case NETHER_WARTS:
-      case NOTE_BLOCK:
-      case OBSIDIAN:
-      case PISTON_MOVING_PIECE:
-      case PISTON_STICKY_BASE:
-      case PORK:
-      case PORTAL:
-      case RECORD_3:
-      case RECORD_4:
-      case RECORD_5:
-      case RECORD_6:
-      case RECORD_7:
-      case RECORD_8:
-      case RECORD_9:
-      case REDSTONE:
-      case REDSTONE_ORE:
-      case REDSTONE_TORCH_OFF:
-      case REDSTONE_TORCH_ON:
-      case REDSTONE_WIRE:
-      case RED_MUSHROOM:
-      case RED_ROSE:
-      case ROTTEN_FLESH:
-      case SADDLE:
-      case SAND:
-      case SANDSTONE:
-      case SAPLING:
-      case SEEDS:
-      case SHEARS:
-      case SIGN:
-      case SIGN_POST:
-      case SLIME_BALL:
-      case SMOOTH_BRICK:
-      case SMOOTH_STAIRS:
-      case SNOW:
-      case SNOW_BALL:
-      case SOIL:
-      case SOUL_SAND:
-      case SPECKLED_MELON:
-      case SPIDER_EYE:
-      case SPONGE:
-      case STATIONARY_LAVA:
-      case STATIONARY_WATER:
-      case STEP:
-      case STICK:
-      case STONE:
-      case STONE_AXE:
-      case STONE_BUTTON: } return null;
+           } return null;
     }
 
     private int getRepairCost(ItemStack is)
@@ -154,117 +100,62 @@ public class EffectRepair extends Effect
       Material mat = is.getType();
       int amt = 1;
       switch (mat) {
-      case LADDER:
-      case SNOW_BLOCK:
-        amt = (int)(is.getDurability() / mat.getMaxDurability() * 2.0D);
-        return amt < 1 ? 1 : amt;
-      case PISTON_EXTENSION:
-      case PUMPKIN:
-      case RAW_BEEF:
-      case RECORD_11:
-        amt = (int)(is.getDurability() / mat.getMaxDurability() * 3.0D);
-        return amt < 1 ? 1 : amt;
-      case PAINTING:
-      case POTION:
-      case PUMPKIN_SEEDS:
-      case RAW_CHICKEN:
-        amt = (int)(is.getDurability() / mat.getMaxDurability() * 4.0D);
-        return amt < 1 ? 1 : amt;
-      case PAPER:
-      case POWERED_MINECART:
-      case PUMPKIN_STEM:
-      case RAW_FISH:
-        amt = (int)(is.getDurability() / mat.getMaxDurability() * 7.0D);
-        return amt < 1 ? 1 : amt;
-      case PISTON_BASE:
-      case POWERED_RAIL:
-      case RAILS:
-      case RECORD_10:
-        amt = (int)(is.getDurability() / mat.getMaxDurability() * 6.0D);
-        return amt < 1 ? 1 : amt;
-      case LEATHER_BOOTS:
-      case LEATHER_CHESTPLATE:
-      case LEVER:
-      case MAGMA_CREAM:
-      case MINECART:
-        amt = (int)(is.getDurability() / mat.getMaxDurability() * 2.0D);
-        return amt < 1 ? 1 : amt;
-      case IRON_SPADE:
-      case LEATHER_LEGGINGS:
-      case LOG:
-      case MELON:
-      case MONSTER_EGG:
-        amt = (int)(is.getDurability() / mat.getMaxDurability() * 2.0D);
-        return amt < 1 ? 1 : amt;
-      case NETHERRACK:
-      case NETHER_BRICK:
-      case NETHER_BRICK_STAIRS:
-      case NETHER_FENCE:
-      case NETHER_STALK:
-        amt = (int)(is.getDurability() / mat.getMaxDurability() * 2.0D);
-        return amt < 1 ? 1 : amt;
-      case IRON_PICKAXE:
-      case LEATHER_HELMET:
-      case LOCKED_CHEST:
-      case MAP:
-      case MOB_SPAWNER:
+          case WOOD_HOE:
+          case WOOD_PICKAXE:
+          case WOOD_PLATE:
+          case WOOD_SPADE:
+          case WOOD_STAIRS:
+          case WOOD_SWORD:
+          case BOW:
+          case FISHING_ROD:
         amt = (int)(is.getDurability() / mat.getMaxDurability() * 1.0D);
         return amt < 1 ? 1 : amt;
-      case IRON_SWORD:
-      case LEAVES:
-      case LONG_GRASS:
-      case MELON_BLOCK:
-      case MONSTER_EGGS:
+          case SHEARS:
+          case GOLD_PICKAXE:
+          case GOLD_SPADE:
+          case GOLD_SWORD:
+          case GOLD_AXE:
+          case GOLD_HOE:
+          case GOLD_CHESTPLATE:
+          case GOLD_HELMET:
+          case GOLD_LEGGINGS:
+          case GOLD_BOOTS:
+        amt = (int)(is.getDurability() / mat.getMaxDurability() * 3.0D);
+        return amt < 1 ? 1 : amt;
+          case IRON_PICKAXE:
+          case IRON_SPADE:
+          case IRON_SWORD:
+          case IRON_AXE:
+          case IRON_HOE:
+          case IRON_CHESTPLATE:
+          case IRON_HELMET:
+          case IRON_LEGGINGS:
+          case IRON_BOOTS:
+        amt = (int)(is.getDurability() / mat.getMaxDurability() * 4.0D);
+        return amt < 1 ? 1 : amt;
+          case DIAMOND_PICKAXE:
+          case DIAMOND_SPADE:
+          case DIAMOND_SWORD:
+          case DIAMOND_AXE:
+          case DIAMOND_HOE:
+          case DIAMOND_CHESTPLATE:
+          case DIAMOND_HELMET:
+          case DIAMOND_LEGGINGS:
+          case DIAMOND_BOOTS:
+        amt = (int)(is.getDurability() / mat.getMaxDurability() * 7.0D);
+        return amt < 1 ? 1 : amt;
+          case STONE_AXE:
+          case STONE_HOE:
+          case STONE_PICKAXE:
+          case STONE_SPADE:
+          case STONE_SWORD:
+          case LEATHER_CHESTPLATE:
+          case LEATHER_HELMET:
+          case LEATHER_LEGGINGS:
+          case LEATHER_BOOTS:
         amt = (int)(is.getDurability() / mat.getMaxDurability() * 2.0D);
         return amt < 1 ? 1 : amt;
-      case JACK_O_LANTERN:
-      case JUKEBOX:
-      case LAPIS_BLOCK:
-      case LAPIS_ORE:
-      case LAVA:
-      case LAVA_BUCKET:
-      case LEATHER:
-      case MELON_SEEDS:
-      case MELON_STEM:
-      case MILK_BUCKET:
-      case MOSSY_COBBLESTONE:
-      case MUSHROOM_SOUP:
-      case MYCEL:
-      case NETHER_WARTS:
-      case NOTE_BLOCK:
-      case OBSIDIAN:
-      case PISTON_MOVING_PIECE:
-      case PISTON_STICKY_BASE:
-      case PORK:
-      case PORTAL:
-      case RECORD_3:
-      case RECORD_4:
-      case RECORD_5:
-      case RECORD_6:
-      case RECORD_7:
-      case RECORD_8:
-      case RECORD_9:
-      case REDSTONE:
-      case REDSTONE_ORE:
-      case REDSTONE_TORCH_OFF:
-      case REDSTONE_TORCH_ON:
-      case REDSTONE_WIRE:
-      case RED_MUSHROOM:
-      case RED_ROSE:
-      case ROTTEN_FLESH:
-      case SADDLE:
-      case SAND:
-      case SANDSTONE:
-      case SAPLING:
-      case SEEDS:
-      case SHEARS:
-      case SIGN:
-      case SIGN_POST:
-      case SLIME_BALL:
-      case SMOOTH_BRICK:
-      case SMOOTH_STAIRS:
-      case SNOW:
-      case SNOW_BALL: } return 0;
+                    } return 0;
     }
 
     @EventHandler
@@ -274,9 +165,14 @@ public class EffectRepair extends Effect
         return;
       }
 
-      Region r = this.effect.getContainingRegion(event.getClickedBlock().getLocation());
-      if (r == null) {
-        return;
+      Region r;
+      try {
+        r = this.effect.aPlugin.getRegionManager().getContainingRegions(event.getClickedBlock().getLocation()).get(0);
+        if (r == null) {
+            return;
+        }
+      } catch (Exception e) {
+          return;
       }
 
       if (this.effect.regionHasEffect(this.effect.aPlugin.getRegionManager().getRegionType(r.getType()).getEffects(), "repair") == 0) {
@@ -306,8 +202,6 @@ public class EffectRepair extends Effect
         player.sendMessage(ChatColor.GRAY + "[HeroStronghold] You don't have enough " + reagent.name().toLowerCase().replace("_", " "));
         return;
       }
-
-      String isName = is.toString();
       player.getInventory().remove(cost);
       is.setDurability((short) 0);
     }
