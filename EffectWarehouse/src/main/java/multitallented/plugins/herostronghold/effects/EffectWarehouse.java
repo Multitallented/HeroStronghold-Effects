@@ -3,16 +3,19 @@ package main.java.multitallented.plugins.herostronghold.effects;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import multitallented.redcastlemedia.bukkit.herostronghold.HeroStronghold;
 import multitallented.redcastlemedia.bukkit.herostronghold.Util;
 import multitallented.redcastlemedia.bukkit.herostronghold.effect.Effect;
+import multitallented.redcastlemedia.bukkit.herostronghold.events.RegionCreatedEvent;
 import multitallented.redcastlemedia.bukkit.herostronghold.events.UpkeepEvent;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.Region;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionManager;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionType;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.SuperRegion;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Chest;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -104,6 +107,9 @@ public class EffectWarehouse extends Effect {
                     }
                 }
             }
+            
+            //TODO move items from upkeep to auxillary chests
+            
             ArrayList<Region> deliverTo = new ArrayList<Region>();
             //Check if any regions nearby need items
             for (SuperRegion sr : rm.getContainingSuperRegions(r.getLocation())) {
@@ -118,18 +124,87 @@ public class EffectWarehouse extends Effect {
                     deliverTo.add(re);
                 }
             }
+            HashMap<Chest, Material> sendItems = new HashMap<Chest, Material>();
             for (Region re : deliverTo) {
                 try {
                     Chest chest = (Chest) re.getLocation().getBlock().getState();
-                    RegionType ret = rm.getRegionType(re.getType());
-                    if (!Util.containsItems(ret.getUpkeep(), chest.getInventory())) {
-                        //check if warehouse has items
-                        
+                    if (chest.getInventory().firstEmpty() < 0) {
+                        continue;
                     }
+                    RegionType ret = rm.getRegionType(re.getType());
+                    outer: for (ItemStack is : ret.getUpkeep()) {
+                        if (is == null) {
+                            continue;
+                        }
+                        int amount = is.getAmount();
+                        for (ItemStack iss : chest.getInventory().getContents()) {
+                            if (iss == null) {
+                                continue;
+                            }
+                            if (iss.getType() == is.getType()) {
+                                amount -= iss.getAmount();
+                                if (amount < 1) {
+                                    continue outer;
+                                }
+                            }
+                        }
+                        sendItems.put(chest, is.getType());
+                        break;
+                    }
+                    
+                    
                 } catch (Exception e) {
                     continue;
                 }
             }
+            if (sendItems.isEmpty()) {
+                return;
+            }
+            
+            for (Chest chest : availableItems) {
+                ArrayList<Integer> removeItems = new ArrayList<Integer>();
+                for (int i = 0; i< chest.getInventory().getContents().length; i++) {
+                    ItemStack is = chest.getInventory().getItem(i);
+                    try {
+                        if (sendItems.containsValue(is.getType())) {
+                            for (Iterator<Chest> itr = sendItems.keySet().iterator(); itr.hasNext();) {
+                                Chest toChest = itr.next();
+                                if (sendItems.get(toChest) == is.getType()) {
+                                    toChest.getInventory().addItem(is);
+                                    toChest.update();
+                                    removeItems.add(i);
+                                    sendItems.remove(toChest);
+                                }
+                            }
+                        }
+                    } catch (NullPointerException npe) {
+                        
+                    }
+                }
+                for (Integer i : removeItems) {
+                    chest.getInventory().clear(i);
+                }
+                chest.update();
+            }
+        }
+        
+        @EventHandler
+        public void onRegionCreated(RegionCreatedEvent event) {
+            RegionManager rm = getPlugin().getRegionManager();
+            Region r = rm.getRegion(event.getLocation());
+            RegionType rt = rm.getRegionType(r.getType());
+            if (effect.regionHasEffect(rt.getEffects(), "warehouse") == 0) {
+                return;
+            }
+            recordAllChests(event.getLocation());
+        }
+        
+        private void recordAllChests(Location l) {
+            RegionManager rm = getPlugin().getRegionManager();
+            Region r = rm.getRegion(l);
+            RegionType rt = rm.getRegionType(r.getType());
+            
+            //TODO record all chests
         }
         
         private ArrayList<Location> processLocationList(List<String> input, World world) {
