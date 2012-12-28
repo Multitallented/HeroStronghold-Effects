@@ -13,13 +13,13 @@ import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionManager;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionType;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.SuperRegion;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
 import org.bukkit.block.Chest;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.inventory.ItemStack;
 
 /**
  *
@@ -55,10 +55,8 @@ public class EffectWarehouse extends Effect {
             }
             RegionType rt = rm.getRegionType(r.getType());
             
-            int warehouse = effect.regionHasEffect(rt.getEffects(), "warehouse");
-            
             //Check if the region is a teleporter
-            if (warehouse == 0) {
+            if (effect.regionHasEffect(rt.getEffects(), "warehouse") == 0) {
                 return;
             }
             
@@ -97,6 +95,9 @@ public class EffectWarehouse extends Effect {
                 }
             } else {
                 for (Location lo : invs.get(r)) {
+                    if (lo.getBlock().getType() != Material.CHEST) {
+                        continue;
+                    }
                     try {
                         availableItems.add((Chest) lo.getBlock().getState());
                     } catch (Exception e) {
@@ -113,16 +114,19 @@ public class EffectWarehouse extends Effect {
                             continue;
                         }
                     } catch (ArrayIndexOutOfBoundsException aioobe) {
-                        continue;
+                        return;
                     }
                     deliverTo.add(re);
                 }
             }
             for (Region re : deliverTo) {
                 try {
+                    if (re.getLocation().getBlock().getType() != Material.CHEST) {
+                        continue;
+                    }
                     Chest chest = (Chest) re.getLocation().getBlock().getState();
                     RegionType ret = rm.getRegionType(re.getType());
-                    if (!Util.containsItems(ret.getUpkeep(), chest.getInventory())) {
+                    if (chest.getInventory() != null && !Util.containsItems(ret.getUpkeep(), chest.getInventory())) {
                         //check if warehouse has items
                         
                     }
