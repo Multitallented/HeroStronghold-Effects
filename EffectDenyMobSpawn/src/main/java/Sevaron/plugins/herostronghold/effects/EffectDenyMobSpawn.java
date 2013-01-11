@@ -10,6 +10,7 @@ import org.bukkit.entity.Monster;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 
 /**
  *
@@ -29,7 +30,7 @@ public class EffectDenyMobSpawn extends Effect implements Listener {
   }
   @EventHandler
   public void onCustomEvent(CreatureSpawnEvent event) {
-      if (event.isCancelled() || !(event.getEntity() instanceof Monster)) {
+      if (event.isCancelled() || event.getSpawnReason() == SpawnReason.CUSTOM || !(event.getEntity() instanceof Monster)) {
           return;
      }
 
