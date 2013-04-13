@@ -35,22 +35,24 @@ public class EffectPeriodicUpkeep extends Effect {
         public void onCustomEvent(UpkeepEvent event) {
             Location l = event.getLocation();
             Region r = getPlugin().getRegionManager().getRegion(event.getLocation());
-            if (r == null) {
+            try {
+                RegionType rt = getPlugin().getRegionManager().getRegionType(r.getType()); 
+
+                //Check if the region has the shoot arrow effect and return arrow velocity
+                if (effect.regionHasEffect(rt.getEffects(), "periodicupkeep") == 0) {
+                    return;
+                }
+
+                //Check to see if the HeroStronghold has enough reagents
+                if (!effect.hasReagents(l)) {
+                    return;
+                }
+                //Run upkeep but don't need to know if upkeep occured
+                effect.forceUpkeep(event);
+            } catch (NullPointerException npe) {
+                npe.printStackTrace();
                 return;
             }
-            RegionType rt = getPlugin().getRegionManager().getRegionType(r.getType()); 
-            
-            //Check if the region has the shoot arrow effect and return arrow velocity
-            if (effect.regionHasEffect(rt.getEffects(), "periodicupkeep") == 0) {
-                return;
-            }
-            
-            //Check to see if the HeroStronghold has enough reagents
-            if (!effect.hasReagents(l)) {
-                return;
-            }
-            //Run upkeep but don't need to know if upkeep occured
-            effect.forceUpkeep(event);
             //effect.forceUpkeep(l);
         }
     }

@@ -101,6 +101,8 @@ public class EffectEvolve extends Effect {
             if (evolve == 0) {
                 return;
             }
+            //Temp bugfix...
+            evolve -= 1;
             
             //Check if config contains regiontype
             if (!evolutions.containsKey(r.getType())) {
@@ -159,11 +161,12 @@ public class EffectEvolve extends Effect {
                                         for (ItemStack is : inv) {
                                             chest1.getInventory().addItem(is);
                                         }
+                                        chest1.update();
                                     } catch (Exception e) {
                                         
                                     }
                                 }
-                            }, 1L);
+                            }, 2L);
                 } catch (Exception e) {
                     
                 }

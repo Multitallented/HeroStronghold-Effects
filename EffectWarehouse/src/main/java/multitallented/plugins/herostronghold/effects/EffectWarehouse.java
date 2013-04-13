@@ -1,12 +1,8 @@
 package main.java.multitallented.plugins.herostronghold.effects;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import multitallented.redcastlemedia.bukkit.herostronghold.HeroStronghold;
-import multitallented.redcastlemedia.bukkit.herostronghold.Util;
 import multitallented.redcastlemedia.bukkit.herostronghold.effect.Effect;
 import multitallented.redcastlemedia.bukkit.herostronghold.events.RegionCreatedEvent;
 import multitallented.redcastlemedia.bukkit.herostronghold.events.UpkeepEvent;
@@ -96,6 +92,8 @@ public class EffectWarehouse extends Effect {
                     }
                     invs.put(r, tempLocations);
                 } catch (Exception e) {
+                    System.out.println("failed to load dataFile");
+                    e.printStackTrace();
                     return;
                 }
             } else {
@@ -108,19 +106,54 @@ public class EffectWarehouse extends Effect {
                 }
             }
             
-            //TODO move items from upkeep to auxillary chests
+            //Move items from main chest to aux chests if possible
+            Chest tempChest = null;
+            HashSet<ItemStack> removeLater = new HashSet<ItemStack>();
+            try {
+                tempChest = (Chest) l.getBlock().getState();
+                for (ItemStack is : tempChest.getInventory().getContents()) {
+                    if (is != null) {
+                        for (Location lo : invs.get(r)) {
+                            try {
+                                Chest aChest = (Chest) lo.getBlock().getState();
+                                if (aChest.getInventory().firstEmpty() > -1) {
+                                    removeLater.add(is);
+                                    aChest.getInventory().addItem(is);
+                                    break;
+                                }
+                            } catch (Exception e) {
+                                
+                            }
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                
+            }
+            for (ItemStack is : removeLater) {
+                tempChest.getInventory().removeItem(is);
+            }
             
             ArrayList<Region> deliverTo = new ArrayList<Region>();
             //Check if any regions nearby need items
             for (SuperRegion sr : rm.getContainingSuperRegions(r.getLocation())) {
                 for (Region re : rm.getContainedRegions(sr)) {
-                    try {
-                        if (!re.getOwners().contains(r.getOwners().get(0))) {
-                            continue;
-                        }
-                    } catch (ArrayIndexOutOfBoundsException aioobe) {
+                    if (re.equals(r) || effect.hasReagents(re.getLocation())) {
                         continue;
                     }
+                    boolean continueT = true;
+                    for (String owner : r.getOwners()) {
+                        if (re.getOwners().contains(owner)) {
+                            continueT = false;
+                            break;
+                        }
+                    }
+                    if (continueT) {
+                        continue;
+                    }
+                    /*if (!re.getOwners().contains(r.getOwners().get(0))) {
+                        continue;
+                    */
                     deliverTo.add(re);
                 }
             }
@@ -132,7 +165,7 @@ public class EffectWarehouse extends Effect {
                         continue;
                     }
                     RegionType ret = rm.getRegionType(re.getType());
-                    outer: for (ItemStack is : ret.getUpkeep()) {
+                    outer: for (ItemStack is : ret.getReagents()) {
                         if (is == null) {
                             continue;
                         }
@@ -167,15 +200,17 @@ public class EffectWarehouse extends Effect {
                     ItemStack is = chest.getInventory().getItem(i);
                     try {
                         if (sendItems.containsValue(is.getType())) {
+                            Chest toChest = null;
                             for (Iterator<Chest> itr = sendItems.keySet().iterator(); itr.hasNext();) {
-                                Chest toChest = itr.next();
+                                toChest = itr.next();
                                 if (sendItems.get(toChest) == is.getType()) {
                                     toChest.getInventory().addItem(is);
                                     toChest.update();
                                     removeItems.add(i);
-                                    sendItems.remove(toChest);
+                                    break;
                                 }
                             }
+                            sendItems.remove(toChest);
                         }
                     } catch (NullPointerException npe) {
                         
@@ -191,27 +226,70 @@ public class EffectWarehouse extends Effect {
         @EventHandler
         public void onRegionCreated(RegionCreatedEvent event) {
             RegionManager rm = getPlugin().getRegionManager();
-            Region r = rm.getRegion(event.getLocation());
+            Region r = event.getRegion();
             RegionType rt = rm.getRegionType(r.getType());
             if (effect.regionHasEffect(rt.getEffects(), "warehouse") == 0) {
                 return;
             }
-            recordAllChests(event.getLocation());
+            recordAllChests(r.getLocation());
         }
         
         private void recordAllChests(Location l) {
             RegionManager rm = getPlugin().getRegionManager();
             Region r = rm.getRegion(l);
             RegionType rt = rm.getRegionType(r.getType());
+            ArrayList<Location> chests = new ArrayList<Location>();
+            int lowerX = (int) r.getLocation().getX() - rt.getRawBuildRadius();
+            int upperX = (int) r.getLocation().getX() + rt.getRawBuildRadius();
+            int lowerY = (int) r.getLocation().getY() - rt.getRawBuildRadius();
+            lowerY = lowerY < 0 ? 0 : lowerY;
+            int upperY = (int) r.getLocation().getY() + rt.getRawBuildRadius();
+            upperY = upperY > 255 ? 255 : upperY;
+            int lowerZ = (int) r.getLocation().getZ() - rt.getRawBuildRadius();
+            int upperZ = (int) r.getLocation().getZ() + rt.getRawBuildRadius();
             
-            //TODO record all chests
+            for (int x = lowerX; x < upperX; x++) {
+                for (int y = lowerY; y < upperY; y++) {
+                    for (int z = lowerZ; z < upperZ; z++) {
+                        try {
+                            Chest chest = (Chest) l.getWorld().getBlockAt(x, y, z).getState();
+                            chests.add(chest.getLocation());
+                        } catch (Exception e) {
+                            
+                        }
+                    }
+                }
+            }
+            
+            invs.put(r, chests);
+            File dataFolder = new File(getPlugin().getDataFolder(), "data");
+            if (!dataFolder.exists()) {
+                getPlugin().warning("Unable to save data/" + r.getID() + ".yml");
+                return;
+            }
+            File dataFile = new File(dataFolder, r.getID() + ".yml");
+            if (!dataFile.exists()) {
+                getPlugin().warning("Unable to write to data/" + r.getID() + ".yml");
+                return;
+            }
+            FileConfiguration config = new YamlConfiguration();
+            try {
+                config.load(dataFile);
+                ArrayList<String> preparedList = new ArrayList<String>();
+                for (Location lo : chests) {
+                    preparedList.add(lo.getX() + ":" + lo.getY() + ":" + lo.getZ());
+                }
+                config.set("chests", preparedList);
+                config.save(dataFile);
+            } catch (Exception e) {
+            }
         }
         
         private ArrayList<Location> processLocationList(List<String> input, World world) {
             ArrayList<Location> tempList = new ArrayList<Location>();
             for (String s : input) {
                 String[] splitString = s.split(":");
-                if (s.length() != 3) {
+                if (splitString.length != 3) {
                     continue;
                 }
                 tempList.add(new Location(world, Double.parseDouble(splitString[0]),

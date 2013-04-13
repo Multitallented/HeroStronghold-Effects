@@ -225,15 +225,24 @@ public class EffectPort extends Effect {
                     if (!p.isOnline() || p.isDead()) {
                         return;
                     }
-                    p.teleport(new Location(l.getWorld(), l.getX(), l.getY() + 1, l.getZ()));
-                    if (mana > 0) {
-                        h.setMana(h.getMana() - mana);
+                    if (h != null && h.isInCombat()) {
+                        p.sendMessage(ChatColor.RED + "[HeroStronghold] You cant use that while in combat");
+                        return;
                     }
-                    if (damage > 0) {
-                        Bukkit.getPluginManager().callEvent(new EntityDamageEvent(p, DamageCause.CUSTOM, damage));
+                    if (mana > h.getMana()) {
+                        p.sendMessage(ChatColor.RED + "[HeroStronghold] You dont have enough mana to port");
+                        return;
                     }
                     if (money > 0 && HeroStronghold.econ != null) {
+                        if (money > HeroStronghold.econ.getBalance(p.getName())) {
+                            p.sendMessage(ChatColor.RED + "[HeroStronghold] You dont have enough money to port");
+                            return;
+                        }
                         HeroStronghold.econ.withdrawPlayer(p.getName(), money);
+                    }
+                    h.setMana(h.getMana() - mana);
+                    if (damage > 0) {
+                        Bukkit.getPluginManager().callEvent(new EntityDamageEvent(p, DamageCause.CUSTOM, damage));
                     }
                     if (stamina > 0) {
                         p.setFoodLevel(p.getFoodLevel() - stamina);
@@ -241,6 +250,7 @@ public class EffectPort extends Effect {
                     for (ItemStack is : reagents) {
                         p.getInventory().removeItem(is);
                     }
+                    p.teleport(new Location(l.getWorld(), l.getX(), l.getY() + 1, l.getZ()));
                     p.sendMessage(ChatColor.GOLD + "[HeroStronghold] You have been teleported!");
                 }
             }, delay);

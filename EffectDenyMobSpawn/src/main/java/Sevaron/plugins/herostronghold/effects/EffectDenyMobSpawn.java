@@ -1,15 +1,15 @@
 package main.java.Sevaron.plugins.herostronghold.effects;
 
+import java.util.Iterator;
 import multitallented.redcastlemedia.bukkit.herostronghold.HeroStronghold;
 import multitallented.redcastlemedia.bukkit.herostronghold.effect.Effect;
-import multitallented.redcastlemedia.bukkit.herostronghold.region.Region;
-import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionManager;
-import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionType;
+import multitallented.redcastlemedia.bukkit.herostronghold.region.*;
 import org.bukkit.Location;
 import org.bukkit.entity.Monster;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.CreatureSpawnEvent;
+import org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason;
 
 /**
  *
@@ -29,22 +29,15 @@ public class EffectDenyMobSpawn extends Effect implements Listener {
   }
   @EventHandler
   public void onCustomEvent(CreatureSpawnEvent event) {
-      if (event.isCancelled() || !(event.getEntity() instanceof Monster)) {
+      if (event.isCancelled() || !(event.getEntity() instanceof Monster) || event.getSpawnReason().equals(SpawnReason.CUSTOM)) {
           return;
      }
 
     Location l = event.getLocation();
     RegionManager rm = this.getPlugin().getRegionManager();
-
-    for (Region r : rm.getContainingRegions(l)) {
-        RegionType rt = rm.getRegionType(r.getType());
-        if (regionHasEffect(rt.getEffects(), "denymobspawn") != 0 && hasReagents(r.getLocation())) {
-            event.setCancelled(true);
-            return;
-        } else if (regionHasEffect(rt.getEffects(), "denymobspawnnoreagent") != 0) {
-            event.setCancelled(true);
-            return;
-        }
+    if (rm.shouldTakeAction(l, null, 0, "denymobspawn", true) ||
+            rm.shouldTakeAction(l, null, 0, "denymobspawnnoreagent", false)) {
+        event.setCancelled(true);
     }
   }
 

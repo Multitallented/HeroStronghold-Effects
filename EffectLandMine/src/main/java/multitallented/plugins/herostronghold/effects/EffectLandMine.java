@@ -17,12 +17,10 @@ import org.bukkit.event.Listener;
  * @author Multitallented
  */
 public class EffectLandMine extends Effect {
-    private final RegionManager rm;
-    private final ConfigManager cm;
+    private final HeroStronghold plugin;
     public EffectLandMine(HeroStronghold plugin) {
         super(plugin);
-        this.rm = plugin.getRegionManager();
-        this.cm = HeroStronghold.getConfigManager();
+        this.plugin = plugin;
         registerEvent(new IntruderListener(this));
     }
     
@@ -39,10 +37,11 @@ public class EffectLandMine extends Effect {
         
         @EventHandler
         public void onCustomEvent(PlayerInRegionEvent event) {
+            RegionManager rm = plugin.getRegionManager();
             Player player = event.getPlayer();
             
             Location l = event.getLocation();
-            ArrayList<String> effects = effect.rm.getRegionType(effect.rm.getRegion(l).getType()).getEffects();
+            ArrayList<String> effects = rm.getRegionType(rm.getRegion(l).getType()).getEffects();
 
             //Check if the region has the shoot arrow effect and return arrow velocity
             int explode = effect.regionHasEffect(effects, "landmine");
@@ -62,9 +61,8 @@ public class EffectLandMine extends Effect {
             //Run upkeep but don't need to know if upkeep occured
             effect.forceUpkeep(event);
             
-            RegionManager rm = effect.getPlugin().getRegionManager();
             //Check to see if exploding regions are enabled
-            if (cm.getExplode()) {
+            if (HeroStronghold.getConfigManager().getExplode()) {
                 rm.destroyRegion(l);
             } else {
                 rm.destroyRegion(l);

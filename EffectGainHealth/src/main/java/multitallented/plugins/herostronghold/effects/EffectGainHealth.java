@@ -43,11 +43,10 @@ public class EffectGainHealth extends Effect {
             Player player = event.getPlayer();
             Hero hero = null;
             Heroes heroes = HeroStronghold.heroes;
-            if (heroes != null)
-                hero = heroes.getCharacterManager().getHero(player);
-            if (hero == null && player.getHealth() == 20) {
-                return;
-            } else if (hero != null && hero.getHealth() == hero.getMaxHealth()) {
+            if (heroes != null) {
+                hero = heroes.getCharacterManager().getHero(player);   
+            }
+            if (player.getHealth() == player.getMaxHealth()) {
                 return;
             }
             
@@ -59,8 +58,9 @@ public class EffectGainHealth extends Effect {
             
             //Check if the region has the shoot arrow effect and return arrow velocity
             int addHealth = effect.regionHasEffect(rt.getEffects(), "gainhealth");
-            if (addHealth == 0)
+            if (addHealth == 0) {
                 return;
+            }
             
             //Check if the player owns or is a member of the region
             if (!effect.isOwnerOfRegion(player, l) && !effect.isMemberOfRegion(player, l)) {
