@@ -1,16 +1,10 @@
 package main.java.multitallented.plugins.herostronghold.effects;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import multitallented.redcastlemedia.bukkit.herostronghold.HeroStronghold;
 import multitallented.redcastlemedia.bukkit.herostronghold.effect.Effect;
-import multitallented.redcastlemedia.bukkit.herostronghold.events.RegionCreatedEvent;
-import multitallented.redcastlemedia.bukkit.herostronghold.events.RegionDestroyedEvent;
-import multitallented.redcastlemedia.bukkit.herostronghold.region.Region;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionCondition;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionManager;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.SuperRegion;
-import org.bukkit.Location;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
@@ -51,7 +45,7 @@ public class EffectPowerShield extends Effect {
             if (rm.shouldTakeAction(event.getLocation(), null, new RegionCondition("powershield", true, 0))) {
                 boolean powerReduced = false;
                 for (SuperRegion sr : rm.getContainingSuperRegions(event.getLocation())) {
-                    if (sr.getPower() > 1 && rm.getRegionType(sr.getType()).getEffects().contains("powershield")) {
+                    if (sr.getPower() > 0 && rm.getRegionType(sr.getType()).getEffects().contains("powershield")) {
                         powerReduced = true;
                         rm.reduceRegion(sr);
                     }
