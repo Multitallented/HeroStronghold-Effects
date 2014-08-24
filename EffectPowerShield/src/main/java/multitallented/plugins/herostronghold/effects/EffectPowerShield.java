@@ -5,7 +5,9 @@ import multitallented.redcastlemedia.bukkit.herostronghold.effect.Effect;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionCondition;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.RegionManager;
 import multitallented.redcastlemedia.bukkit.herostronghold.region.SuperRegion;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.Player;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -38,19 +40,22 @@ public class EffectPowerShield extends Effect {
         
         @EventHandler(ignoreCancelled = true, priority = EventPriority.LOW)
         public void onEntityExplode(EntityExplodeEvent event) {
+            Player me = Bukkit.getPlayer("Multitallented");
             Entity e = event.getEntity();
-            if (!e.getClass().equals(TNTPrimed.class)) {
+            
+            if (!(e instanceof TNTPrimed)) {
                 return;
             }
             if (rm.shouldTakeAction(event.getLocation(), null, new RegionCondition("powershield", true, 0))) {
                 boolean powerReduced = false;
                 for (SuperRegion sr : rm.getContainingSuperRegions(event.getLocation())) {
-                    if (sr.getPower() > 0 && rm.getRegionType(sr.getType()).getEffects().contains("powershield")) {
+                    if (sr.getPower() > 0 && rm.getSuperRegionType(sr.getType()).getEffects().contains("powershield")) {
+                        
                         powerReduced = true;
                         rm.reduceRegion(sr);
                     }
                 }
-                if (!powerReduced) {
+                if (powerReduced) {
                     event.setCancelled(true);
                 }
             }
